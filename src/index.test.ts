@@ -2,7 +2,42 @@ import { where } from './';
 
 describe('Query Builder', () => {
   describe('where()', () => {
-    it.todo('should concatenate field names, operators, and values into an SQL where clause');
+    it('should concatenate field names, operators, and values into an SQL where clause', () => {
+      const fieldOptions = [
+        {
+          name: 'predltv',
+          type: 'smallint'
+        },
+        {
+          name: 'ordercount',
+          type: 'integer'
+        }
+      ];
+
+      const query = {
+        id: '1',
+        combinator: 'and',
+        rules: [
+          {
+            id: '1',
+            value:'2000',
+            field: 'predltv',
+            operator: '=',
+          },
+          {
+            id: '2',
+            value:'5',
+            field: 'ordercount',
+            operator: '>',
+          }
+        ],
+      };
+
+      const expectedClause = '(predltv = 2000 AND ordercount > 5)';
+
+      expect(where(query, fieldOptions)).toBe(expectedClause);
+    });
+
     it.todo('should wrap string values in SQL wildcards when the operator is `ilike`');
     it.todo('should wrap string values in SQL wildcards when the operator is `not ilike`');
     it.todo('should wrap string values in SQL wildcards when the operator is `not ilike`');
