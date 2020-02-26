@@ -172,8 +172,67 @@ describe('Query Builder', () => {
     });
 
     it.todo('should build associative clauses when the query has associationType and associationField properties');
-    it.todo('should throw an error when there isn`t a field option for a given query type');
-    it.todo('should throw an error for a date query when the date op isn`t provided');
-    it.todo('should return an empty string if there are no rules on the root query');
+
+    it('should throw an error when there isn`t a field option for a given query type', () => {
+      const fieldOptions = [
+        {
+          name: 'Foo',
+          type: 'string',
+        },
+      ];
+
+      const query = {
+        id: '1',
+        combinator: 'and',
+        rules: [
+          {
+            id: '1',
+            value: 'joebloggs',
+            field: 'useremail',
+            operator: 'not ilike',
+          },
+        ],
+      };
+
+      expect(() => where(query, fieldOptions)).toThrow(
+        new Error('Corresponding field option not found for field useremail'),
+      );
+    });
+
+    it('should throw an error for a date query when the date op isn`t provided', () => {
+      const fieldOptions = [
+        {
+          name: 'dob',
+          type: 'date',
+        },
+      ];
+
+      const query = {
+        id: '1',
+        combinator: 'or',
+        rules: [
+          {
+            id: '1',
+            value: 'run date',
+            field: 'dob',
+            operator: '=',
+          },
+        ],
+      };
+
+      expect(() => where(query, fieldOptions)).toThrow(
+        new Error('No date op provided for date condition with value of run date'),
+      );
+    });
+
+    it('should return an empty string if there are no rules on the root query', () => {
+      const query = {
+        id: '1',
+        combinator: 'or',
+        rules: [],
+      };
+
+      expect(where(query, [])).toBe('');
+    });
   });
 });
