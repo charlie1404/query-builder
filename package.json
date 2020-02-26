@@ -4,6 +4,9 @@
   "description": "Builds SQL query strings from AIS-conformant query and filter field objects",
   "main": "dist/index.js",
   "scripts": {
+    "lint": "eslint 'src/**/*.ts'",
+    "format:check": "prettier --check jest.config.js 'src/**/*.ts'",
+    "format:write": "prettier --write jest.config.js 'src/**/*.ts'",
     "test": "jest"
   },
   "repository": {
@@ -25,7 +28,11 @@
   "homepage": "https://github.com/peak-ai/query-builder#readme",
   "devDependencies": {
     "@types/jest": "25.1.3",
+    "@typescript-eslint/eslint-plugin": "2.21.0",
+    "@typescript-eslint/parser": "2.21.0",
+    "eslint": "6.8.0",
     "jest": "25.1.0",
+    "prettier": "1.19.1",
     "ts-jest": "25.2.1",
     "typescript": "3.8.2"
   },

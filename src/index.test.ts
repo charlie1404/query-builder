@@ -171,7 +171,9 @@ describe('Query Builder', () => {
       expect(where(query, fieldOptions)).toBe(expectedClause);
     });
 
-    it.todo('should build associative clauses when the query has associationType and associationField properties');
+    it.todo(
+      'should build associative clauses when the query has associationType and associationField properties',
+    );
 
     it('should throw an error when there isn`t a field option for a given query type', () => {
       const fieldOptions = [
@@ -221,7 +223,9 @@ describe('Query Builder', () => {
       };
 
       expect(() => where(query, fieldOptions)).toThrow(
-        new Error('No date op provided for date condition with value of run date'),
+        new Error(
+          'No date op provided for date condition with value of run date',
+        ),
       );
     });
 
