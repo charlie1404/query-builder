@@ -21,6 +21,7 @@ interface FieldOption {
 
 // TODO: refine types
 const getValue = (type: string, value: string | number, operator: string, date?: string) => {
+  // TODO: define this once
   const dateMap = { ADD: '+', SUBTRACT: '-' };
 
   if (operator === 'is null' || operator === 'is not null') {
