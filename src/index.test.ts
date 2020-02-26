@@ -171,9 +171,37 @@ describe('Query Builder', () => {
       expect(where(query, fieldOptions)).toBe(expectedClause);
     });
 
-    it.todo(
-      'should build associative clauses when the query has associationType and associationField properties',
-    );
+    it('should build associative clauses when the query has associationType and associationField properties', () => {
+      const fieldOptions = [
+        {
+          name: 'associationtype',
+          type: 'string', // TODO: support Master DB types (e.g. small)
+          label: 'Brand',
+          autocomplete: true,
+          associationType: 'Brand',
+          associatedField: 'associationvalue',
+        },
+      ];
+
+      const query = {
+        id: '1',
+        combinator: 'and',
+        rules: [
+          {
+            associatedField: 'associationvalue',
+            associationType: 'Brand',
+            field: 'associationtype',
+            id: '1',
+            operator: '=',
+            value: 'Nike',
+          },
+        ],
+      };
+
+      const expectedClause = `(associationtype = 'Brand' and associationvalue = 'Nike')`;
+
+      expect(where(query, fieldOptions)).toBe(expectedClause);
+    });
 
     it('should throw an error when there isn`t a field option for a given query type', () => {
       const fieldOptions = [
