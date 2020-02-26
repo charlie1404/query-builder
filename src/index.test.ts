@@ -96,5 +96,6 @@ describe('Query Builder', () => {
     it.todo('should build associative clauses when the query has associationType and associationField properties');
     it.todo('should throw an error when there isn`t a field option for a given query type');
     it.todo('should throw an error for a date query when the date op isn`t provided');
+    it.todo('should return an empty string if there are no rules on the root query');
   });
 });

@@ -76,6 +76,6 @@ const buildWhereClause = (query: RootQuery | Query, fieldOptions: FieldOption[])
   return `${query.field} ${query.operator}${value}`;
 };
 
-export const where = (query: RootQuery, fieldOptions: FieldOption[]) => query.rules && query.rules.length
+export const where = (query: RootQuery, fieldOptions: FieldOption[]) => query.rules.length
   ? `${buildWhereClause(query, fieldOptions)}`
   : '';
