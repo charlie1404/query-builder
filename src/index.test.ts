@@ -6,8 +6,8 @@ describe('Query Builder', () => {
     it.todo('should wrap string values in SQL wildcards when the operator is `ilike`');
     it.todo('should wrap string values in SQL wildcards when the operator is `not ilike`');
     it.todo('should wrap string values in SQL wildcards when the operator is `not ilike`');
-    it.todo('should format the value as a date when when the type is `date` and the date parameter is `CALENDAR`');
-    it.todo('should compute a date add operation when the date parameter is `ADD`');
-    it.todo('should compute a date subtract operation when the date parameter is `SUBTRACT`');
+    it.todo('should format the value as a date when when the type is `date` and the date operator is `CALENDAR`');
+    it.todo('should compute a date add operation when the date operator is `ADD`');
+    it.todo('should compute a date subtract operation when the date operator is `SUBTRACT`');
   });
 });
