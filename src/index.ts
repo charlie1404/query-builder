@@ -32,8 +32,6 @@ const mapDateOp = (date: string, dateOp: Exclude<DateOp, 'CALENDAR'>) => ` (CURR
 
 // TODO: refine types
 const getValue = (type: string, value: string, operator: string, dateOp?: DateOp) => {
-  // TODO: define this once
-
   if (operator === 'is null' || operator === 'is not null') {
     return '';
   }
@@ -41,7 +39,7 @@ const getValue = (type: string, value: string, operator: string, dateOp?: DateOp
   switch (type) {
     case 'date': {
       if (!dateOp) {
-        throw new Error();
+        throw new Error(`No date op provided for date condition with value of ${value}`);
       }
 
       return dateOp === 'CALENDAR' ? formatDate(value) : mapDateOp(value, dateOp);
