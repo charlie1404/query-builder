@@ -6,12 +6,12 @@ describe('Query Builder', () => {
       const fieldOptions = [
         {
           name: 'predltv',
-          type: 'smallint'
+          type: 'smallint',
         },
         {
           name: 'ordercount',
-          type: 'integer'
-        }
+          type: 'integer',
+        },
       ];
 
       const query = {
@@ -20,16 +20,16 @@ describe('Query Builder', () => {
         rules: [
           {
             id: '1',
-            value:'2000',
+            value: '2000',
             field: 'predltv',
             operator: '=',
           },
           {
             id: '2',
-            value:'5',
+            value: '5',
             field: 'ordercount',
             operator: '>',
-          }
+          },
         ],
       };
 
@@ -38,9 +38,58 @@ describe('Query Builder', () => {
       expect(where(query, fieldOptions)).toBe(expectedClause);
     });
 
-    it.todo('should wrap string values in SQL wildcards when the operator is `ilike`');
-    it.todo('should wrap string values in SQL wildcards when the operator is `not ilike`');
-    it.todo('should wrap string values in SQL wildcards when the operator is `not ilike`');
+    it('should wrap string values in SQL wildcards when the operator is `ilike`', () => {
+      const fieldOptions = [
+        {
+          name: 'useremail',
+          type: 'string',
+        },
+      ];
+
+      const query = {
+        id: '1',
+        combinator: 'and',
+        rules: [
+          {
+            id: '1',
+            value: 'joebloggs',
+            field: 'useremail',
+            operator: 'ilike',
+          },
+        ],
+      };
+
+      const expectedClause = '(useremail ilike %joebloggs%)';
+
+      expect(where(query, fieldOptions)).toBe(expectedClause);
+    });
+
+    it('should wrap string values in SQL wildcards when the operator is `not ilike`', () => {
+      const fieldOptions = [
+        {
+          name: 'useremail',
+          type: 'string',
+        },
+      ];
+
+      const query = {
+        id: '1',
+        combinator: 'and',
+        rules: [
+          {
+            id: '1',
+            value: 'joebloggs',
+            field: 'useremail',
+            operator: 'not ilike',
+          },
+        ],
+      };
+
+      const expectedClause = '(useremail not ilike %joebloggs%)';
+
+      expect(where(query, fieldOptions)).toBe(expectedClause);
+    });
+
     it.todo('should format the value as a date when when the type is `date` and the date operator is `CALENDAR`');
     it.todo('should compute a date add operation when the date operator is `ADD`');
     it.todo('should compute a date subtract operation when the date operator is `SUBTRACT`');
