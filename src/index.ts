@@ -5,6 +5,8 @@ import * as moment from 'moment';
 
 type DateOp = 'ADD' | 'SUBTRACT' | 'CALENDAR';
 
+type Value = string | Date;
+
 interface RootQuery {
   id: string;
   combinator: string;
@@ -16,7 +18,7 @@ interface Query {
   id: string;
   field: string;
   operator: string;
-  value: string;
+  value: Value;
   date?: DateOp;
 }
 
@@ -32,11 +34,11 @@ const DATE_OP_MAP = {
   SUBTRACT: '-',
 };
 
-const formatDate = (date: string) => ` '${moment(date).format('YYYY-MM-DD')}'`;
+const formatDate = (date: Date) => ` '${moment(date).format('YYYY-MM-DD')}'`;
 
-const mapDateOp = (date: string, dateOp: Exclude<DateOp, 'CALENDAR'>) => ` (CURRENT_DATE ${DATE_OP_MAP[dateOp]} ${date})`;
+const mapDateOp = (date: Date, dateOp: Exclude<DateOp, 'CALENDAR'>) => ` (CURRENT_DATE ${DATE_OP_MAP[dateOp]} ${date})`;
 
-const getValue = (type: string, value: string, operator: string, dateOp?: DateOp) => {
+const getValue = (type: string, value: Value, operator: string, dateOp?: DateOp) => {
   if (operator === 'is null' || operator === 'is not null') {
     return '';
   }
@@ -47,7 +49,7 @@ const getValue = (type: string, value: string, operator: string, dateOp?: DateOp
         throw new Error(`No date op provided for date condition with value of ${value}`);
       }
 
-      return dateOp === 'CALENDAR' ? formatDate(value) : mapDateOp(value, dateOp);
+      return dateOp === 'CALENDAR' ? formatDate(value as Date) : mapDateOp(value as Date, dateOp);
     }
     case 'string': {
       return (operator === 'ilike' || operator === 'not ilike') ? ` %${value}%` : ` '${value}'`;
