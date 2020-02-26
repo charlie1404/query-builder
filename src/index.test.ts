@@ -174,7 +174,7 @@ describe('Query Builder', () => {
     it('should build associative clauses when the query has associationType and associationField properties', () => {
       const fieldOptions = [
         {
-          name: 'associationtype',
+          name: 'associationvalue',
           type: 'string', // TODO: support Master DB types (e.g. small)
           label: 'Brand',
           autocomplete: true,
@@ -188,9 +188,9 @@ describe('Query Builder', () => {
         combinator: 'and',
         rules: [
           {
-            associatedField: 'associationvalue',
+            associationField: 'associationtype', // TODO: tweak in segment explorer!
             associationType: 'Brand',
-            field: 'associationtype',
+            field: 'associationvalue',
             id: '1',
             operator: '=',
             value: 'Nike',

@@ -14,7 +14,7 @@ interface RootQuery {
 }
 
 // TODO: additional fields e.g. label?
-interface Query {
+interface StandardQuery {
   id: string;
   field: string;
   operator: string;
@@ -22,8 +22,13 @@ interface Query {
   date?: DateOp;
 }
 
-/* TODO: additional options
- * for assoc. fields */
+interface AssociatedQuery extends StandardQuery {
+  associationField: string;
+  associationType: string;
+}
+
+type Query = RootQuery | AssociatedQuery | StandardQuery;
+
 interface FieldOption {
   name: string;
   type: string;
@@ -61,6 +66,7 @@ const getValue = (
         ? formatDate(value as Date)
         : mapDateOp(value as Date, dateOp);
     }
+    // TODO: case 'small', 'medium' etc.
     case 'string': {
       return operator === 'ilike' || operator === 'not ilike'
         ? ` %${value}%`
@@ -71,17 +77,25 @@ const getValue = (
   }
 };
 
-const isRootQuery = (query: RootQuery | Query): query is RootQuery =>
+const isRootQuery = (query: Query): query is RootQuery =>
   (query as RootQuery).rules && (query as RootQuery).rules.length > 0;
 
+const isAssociatedQuery = (query: Query): query is AssociatedQuery =>
+  'associationType' in query && 'associationField' in query;
+
 const buildWhereClause = (
-  query: RootQuery | Query,
+  query: Query,
   fieldOptions: FieldOption[],
 ): string => {
   if (isRootQuery(query)) {
     return `(${query.rules
       .map(q => buildWhereClause(q, fieldOptions))
       .join(` ${query.combinator.toUpperCase()} `)})`;
+  }
+
+  if (isAssociatedQuery(query)) {
+    const { associationField, associationType, ...rest } = query;
+    return `${associationField} =${getValue('string', associationType, '=')} and ${buildWhereClause(rest, fieldOptions)}`
   }
 
   const { type } = fieldOptions.find(a => a.name === query.field) || {};
