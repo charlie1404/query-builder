@@ -175,7 +175,7 @@ describe('Query Builder', () => {
       const fieldOptions = [
         {
           name: 'associationvalue',
-          type: 'string', // TODO: support Master DB types (e.g. small)
+          type: 'small', // TODO: support Master DB types (e.g. small)
           label: 'Brand',
           autocomplete: true,
           associationType: 'Brand',

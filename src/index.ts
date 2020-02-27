@@ -54,7 +54,7 @@ const getValue = (
   }
 
   switch (type) {
-    case 'date': {
+    case 'date':
       if (!dateOp) {
         throw new Error(
           `No date op provided for date condition with value of ${value}`,
@@ -64,13 +64,14 @@ const getValue = (
       return dateOp === 'CALENDAR'
         ? formatDate(value as Date)
         : mapDateOp(value as Date, dateOp);
-    }
-    // TODO: case 'small', 'medium' etc.
-    case 'string': {
+
+    case 'string':
+    case 'small':
+    case 'medium':
+    case 'large':
       return operator === 'ilike' || operator === 'not ilike'
         ? ` %${value}%`
         : ` '${value}'`;
-    }
     default:
       return ` ${value}`;
   }
