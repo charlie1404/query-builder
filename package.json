@@ -1,6 +1,6 @@
 {
   "name": "@peak-ai/query-builder",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Builds SQL query strings from AIS-conformant query and filter field objects",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -15,6 +15,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/peak-ai/query-builder.git"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "keywords": [
     "sql",
