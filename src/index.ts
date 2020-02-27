@@ -5,7 +5,15 @@ type Value = string | Date;
 interface RootQuery {
   id: string;
   combinator: string;
-  rules: Query[];
+  rules?: DefinedQuery[];
+}
+
+/* Overriding rules to be non-nullable
+ * if the array exists at runtime is
+ * a workaround for the nature in which
+ * our frontend is initially rendered */
+interface DefinedRootQuery extends RootQuery {
+  rules: DefinedQuery[];
 }
 
 interface StandardQuery {
@@ -21,7 +29,7 @@ interface AssociatedQuery extends StandardQuery {
   associationType: string;
 }
 
-type Query = RootQuery | AssociatedQuery | StandardQuery;
+type DefinedQuery = DefinedRootQuery | AssociatedQuery | StandardQuery;
 
 interface FieldOption {
   name: string;
@@ -71,21 +79,25 @@ const getValue = (
   }
 };
 
-const isRootQuery = (query: Query): query is RootQuery =>
-  (query as RootQuery).rules && (query as RootQuery).rules.length > 0;
+const isDefinedRootQuery = (query: DefinedQuery): query is DefinedRootQuery =>
+  (query as DefinedRootQuery).rules &&
+  (query as DefinedRootQuery).rules.length > 0;
 
-const isAssociatedQuery = (query: Query): query is AssociatedQuery =>
+const isAssociatedQuery = (query: DefinedQuery): query is AssociatedQuery =>
   Boolean(
     (query as AssociatedQuery).associationType &&
       (query as AssociatedQuery).associationTypeFieldName,
   );
 
+const hasRules = (query: RootQuery): query is DefinedRootQuery =>
+  Boolean(query.rules && query.rules.length);
+
 const buildWhereClause = (
-  query: Query,
+  query: DefinedQuery,
   fieldOptions: FieldOption[],
   formatDate: DateFormatter,
 ): string => {
-  if (isRootQuery(query)) {
+  if (isDefinedRootQuery(query)) {
     return `(${query.rules
       .map(q => buildWhereClause(q, fieldOptions, formatDate))
       .join(` ${query.combinator.toUpperCase()} `)})`;
@@ -122,7 +134,7 @@ const buildWhereClause = (
 
 const createQueryBuilder = (formatDate: DateFormatter) => ({
   where: (query: RootQuery, fieldOptions: FieldOption[]) =>
-    query.rules.length
+    hasRules(query)
       ? `${buildWhereClause(query, fieldOptions, formatDate)}`
       : '',
 });

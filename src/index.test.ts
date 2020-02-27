@@ -383,5 +383,16 @@ describe('Query Builder', () => {
 
       expect(queryBuilder.where(query, [])).toBe('');
     });
+
+    /* Required as query passed via props
+     * doesn't have an initial default */
+    it('should return an empty string if top-level rules array is undefined', () => {
+      const query = {
+        id: '1',
+        combinator: 'or',
+      };
+
+      expect(queryBuilder.where(query, [])).toBe('');
+    });
   });
 });
