@@ -106,14 +106,22 @@ const buildWhereClause = (
     );
   }
 
-  const value = getValue(type, query.value, query.operator, formatDate, query.date);
+  const value = getValue(
+    type,
+    query.value,
+    query.operator,
+    formatDate,
+    query.date,
+  );
 
   return `${query.field} ${query.operator}${value}`;
 };
 
 const createQueryBuilder = (formatDate: DateFormatter) => ({
   where: (query: RootQuery, fieldOptions: FieldOption[]) =>
-    query.rules.length ? `${buildWhereClause(query, fieldOptions, formatDate)}` : '',
+    query.rules.length
+      ? `${buildWhereClause(query, fieldOptions, formatDate)}`
+      : '',
 });
 
 export default createQueryBuilder;
