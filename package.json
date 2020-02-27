@@ -1,6 +1,6 @@
 {
   "name": "query-builder",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Builds SQL query strings from AIS-conformant query and filter field objects",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
