@@ -188,7 +188,7 @@ describe('Query Builder', () => {
         combinator: 'and',
         rules: [
           {
-            associationField: 'associationtype', // TODO: tweak in segment explorer!
+            associationTypeFieldName: 'associationtype', // TODO: tweak in segment explorer!
             associationType: 'Brand',
             field: 'associationvalue',
             id: '1',

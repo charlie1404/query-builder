@@ -13,7 +13,6 @@ interface RootQuery {
   rules: Query[];
 }
 
-// TODO: additional fields e.g. label?
 interface StandardQuery {
   id: string;
   field: string;
@@ -23,7 +22,7 @@ interface StandardQuery {
 }
 
 interface AssociatedQuery extends StandardQuery {
-  associationField: string;
+  associationTypeFieldName: string;
   associationType: string;
 }
 
@@ -81,7 +80,7 @@ const isRootQuery = (query: Query): query is RootQuery =>
   (query as RootQuery).rules && (query as RootQuery).rules.length > 0;
 
 const isAssociatedQuery = (query: Query): query is AssociatedQuery =>
-  'associationType' in query && 'associationField' in query;
+  'associationType' in query && 'associationTypeFieldName' in query;
 
 const buildWhereClause = (
   query: Query,
@@ -94,8 +93,8 @@ const buildWhereClause = (
   }
 
   if (isAssociatedQuery(query)) {
-    const { associationField, associationType, ...rest } = query;
-    return `${associationField} =${getValue('string', associationType, '=')} and ${buildWhereClause(rest, fieldOptions)}`
+    const { associationTypeFieldName, associationType, ...innerQuery } = query;
+    return `${associationTypeFieldName} =${getValue('string', associationType, '=')} and ${buildWhereClause(innerQuery, fieldOptions)}`
   }
 
   const { type } = fieldOptions.find(a => a.name === query.field) || {};
