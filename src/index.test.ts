@@ -2,7 +2,7 @@ import * as moment from 'moment';
 import createQueryBuilder from './';
 
 describe('Query Builder', () => {
-  const formatDate = (date: Date) => ` '${moment(date).format('YYYY-MM-DD')}'`;
+  const formatDate = (date: Date) => moment(date).format('YYYY-MM-DD');
   const queryBuilder = createQueryBuilder(formatDate);
 
   describe('where()', () => {
@@ -173,6 +173,36 @@ describe('Query Builder', () => {
       const expectedClause = `(dob = (CURRENT_DATE - run date))`;
 
       expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+    });
+
+    it('should support different date formatters', () => {
+      const gbFormatter = (date: Date) => moment(date).format('DD/MM/YYYY');
+      const gbBuilder = createQueryBuilder(gbFormatter);
+
+      const fieldOptions = [
+        {
+          name: 'dob',
+          type: 'date',
+        },
+      ];
+
+      const query = {
+        id: '1',
+        combinator: 'or',
+        rules: [
+          {
+            id: '1',
+            value: new Date(1582735631000),
+            field: 'dob',
+            operator: '=',
+            date: 'CALENDAR' as const,
+          },
+        ],
+      };
+
+      const expectedClause = `(dob = '26/02/2020')`;
+
+      expect(gbBuilder.where(query, fieldOptions)).toBe(expectedClause);
     });
 
     it('should build associative clauses when the query has associationType and associationField properties', () => {

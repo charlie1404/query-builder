@@ -56,7 +56,7 @@ const getValue = (
       }
 
       return dateOp === 'CALENDAR'
-        ? formatDate(value as Date)
+        ? ` '${formatDate(value as Date)}'`
         : mapDateOp(value as Date, dateOp);
 
     case 'string':
