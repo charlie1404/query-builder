@@ -212,8 +212,6 @@ describe('Query Builder', () => {
           type: 'small',
           label: 'Brand',
           autocomplete: true,
-          associationType: 'Brand',
-          associatedField: 'associationvalue',
         },
       ];
 
