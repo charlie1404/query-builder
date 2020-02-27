@@ -3,10 +3,13 @@
   "version": "0.0.1",
   "description": "Builds SQL query strings from AIS-conformant query and filter field objects",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "lint": "eslint 'src/**/*.ts'",
     "format:check": "prettier --check jest.config.js 'src/**/*.ts'",
     "format:write": "prettier --write jest.config.js 'src/**/*.ts'",
+    "build": "tsc -p .",
+    "prepublishOnly": "yarn lint && yarn format:check && yarn build && yarn test",
     "test": "jest"
   },
   "repository": {
