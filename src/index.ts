@@ -75,7 +75,10 @@ const isRootQuery = (query: Query): query is RootQuery =>
   (query as RootQuery).rules && (query as RootQuery).rules.length > 0;
 
 const isAssociatedQuery = (query: Query): query is AssociatedQuery =>
-  'associationType' in query && 'associationTypeFieldName' in query;
+  Boolean(
+    (query as AssociatedQuery).associationType &&
+      (query as AssociatedQuery).associationTypeFieldName,
+  );
 
 const buildWhereClause = (
   query: Query,

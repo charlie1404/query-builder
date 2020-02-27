@@ -235,6 +235,39 @@ describe('Query Builder', () => {
       expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
     });
 
+    /* This test is required as GraphQL will resolve
+     * optional fields to `null` when the underlying
+     * items don't have values for them. */
+    it('should treat rules regularly when the association props are present but null', () => {
+      const fieldOptions = [
+        {
+          name: 'brand',
+          type: 'small',
+          label: 'Brand',
+          autocomplete: true,
+        },
+      ];
+
+      const query = {
+        id: '1',
+        combinator: 'and',
+        rules: [
+          {
+            associationTypeFieldName: null,
+            associationType: null,
+            field: 'brand',
+            id: '1',
+            operator: '=',
+            value: 'Nike',
+          },
+        ],
+      };
+
+      const expectedClause = `(brand = 'Nike')`;
+
+      expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+    });
+
     it('should support nested rule groups', () => {
       const fieldOptions = [
         {
