@@ -237,6 +237,58 @@ describe('Query Builder', () => {
       expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
     });
 
+    it('should support nested rule groups', () => {
+      const fieldOptions = [
+        {
+          name: 'useremail',
+          type: 'large',
+        },
+        {
+          name: 'ordercount',
+          type: 'integer',
+        },
+        {
+          name: 'customergender',
+          type: 'small',
+        },
+      ];
+
+      const query = {
+        id: '1',
+        combinator: 'and',
+        rules: [
+          {
+            id: '1',
+            field: 'useremail',
+            value: 'joebloggs@gmail.com',
+            operator: '=',
+          },
+          {
+            id: '2',
+            combinator: 'or',
+            rules: [
+              {
+                id: '2',
+                field: 'ordercount',
+                value: '20',
+                operator: '>',
+              },
+              {
+                id: '3',
+                field: 'customergender',
+                value: 'male',
+                operator: '=',
+              },
+            ],
+          },
+        ],
+      };
+
+      const expectedClause = `(useremail = 'joebloggs@gmail.com' AND (ordercount > 20 OR customergender = 'male'))`;
+
+      expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+    });
+
     it('should throw an error when there isn`t a field option for a given query type', () => {
       const fieldOptions = [
         {
