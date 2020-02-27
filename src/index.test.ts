@@ -1,6 +1,10 @@
-import { where } from './';
+import * as moment from 'moment';
+import createQueryBuilder from './';
 
 describe('Query Builder', () => {
+  const formatDate = (date: Date) => ` '${moment(date).format('YYYY-MM-DD')}'`;
+  const queryBuilder = createQueryBuilder(formatDate);
+
   describe('where()', () => {
     it('should concatenate field names, operators, and values into an SQL where clause', () => {
       const fieldOptions = [
@@ -35,7 +39,7 @@ describe('Query Builder', () => {
 
       const expectedClause = '(predltv = 2000 AND ordercount > 5)';
 
-      expect(where(query, fieldOptions)).toBe(expectedClause);
+      expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
     });
 
     it('should wrap string values in SQL wildcards when the operator is `ilike`', () => {
@@ -61,7 +65,7 @@ describe('Query Builder', () => {
 
       const expectedClause = '(useremail ilike %joebloggs%)';
 
-      expect(where(query, fieldOptions)).toBe(expectedClause);
+      expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
     });
 
     it('should wrap string values in SQL wildcards when the operator is `not ilike`', () => {
@@ -87,7 +91,7 @@ describe('Query Builder', () => {
 
       const expectedClause = '(useremail not ilike %joebloggs%)';
 
-      expect(where(query, fieldOptions)).toBe(expectedClause);
+      expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
     });
 
     it('should format the value as a date when when the type is `date` and the date operator is `CALENDAR`', () => {
@@ -114,7 +118,7 @@ describe('Query Builder', () => {
 
       const expectedClause = `(dob = '2020-02-26')`;
 
-      expect(where(query, fieldOptions)).toBe(expectedClause);
+      expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
     });
 
     it('should compute a date add operation when the date operator is `ADD`', () => {
@@ -141,7 +145,7 @@ describe('Query Builder', () => {
 
       const expectedClause = `(dob = (CURRENT_DATE + run date))`;
 
-      expect(where(query, fieldOptions)).toBe(expectedClause);
+      expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
     });
 
     it('should compute a date subtract operation when the date operator is `SUBTRACT`', () => {
@@ -168,14 +172,14 @@ describe('Query Builder', () => {
 
       const expectedClause = `(dob = (CURRENT_DATE - run date))`;
 
-      expect(where(query, fieldOptions)).toBe(expectedClause);
+      expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
     });
 
     it('should build associative clauses when the query has associationType and associationField properties', () => {
       const fieldOptions = [
         {
           name: 'associationvalue',
-          type: 'small', // TODO: support Master DB types (e.g. small)
+          type: 'small',
           label: 'Brand',
           autocomplete: true,
           associationType: 'Brand',
@@ -200,7 +204,7 @@ describe('Query Builder', () => {
 
       const expectedClause = `(associationtype = 'Brand' and associationvalue = 'Nike')`;
 
-      expect(where(query, fieldOptions)).toBe(expectedClause);
+      expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
     });
 
     it('should throw an error when there isn`t a field option for a given query type', () => {
@@ -224,7 +228,7 @@ describe('Query Builder', () => {
         ],
       };
 
-      expect(() => where(query, fieldOptions)).toThrow(
+      expect(() => queryBuilder.where(query, fieldOptions)).toThrow(
         new Error('Corresponding field option not found for field useremail'),
       );
     });
@@ -250,7 +254,7 @@ describe('Query Builder', () => {
         ],
       };
 
-      expect(() => where(query, fieldOptions)).toThrow(
+      expect(() => queryBuilder.where(query, fieldOptions)).toThrow(
         new Error(
           'No date op provided for date condition with value of run date',
         ),
@@ -264,7 +268,7 @@ describe('Query Builder', () => {
         rules: [],
       };
 
-      expect(where(query, [])).toBe('');
+      expect(queryBuilder.where(query, [])).toBe('');
     });
   });
 });

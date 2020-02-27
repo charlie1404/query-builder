@@ -1,10 +1,5 @@
-/* TODO: replace moment with
- * smaller lib or own impl
- * once tests are in place. */
-import * as moment from 'moment';
-
+type DateFormatter = (date: Date) => string;
 type DateOp = 'ADD' | 'SUBTRACT' | 'CALENDAR';
-
 type Value = string | Date;
 
 interface RootQuery {
@@ -38,8 +33,6 @@ const DATE_OP_MAP = {
   SUBTRACT: '-',
 };
 
-const formatDate = (date: Date) => ` '${moment(date).format('YYYY-MM-DD')}'`;
-
 const mapDateOp = (date: Date, dateOp: Exclude<DateOp, 'CALENDAR'>) =>
   ` (CURRENT_DATE ${DATE_OP_MAP[dateOp]} ${date})`;
 
@@ -47,6 +40,7 @@ const getValue = (
   type: string,
   value: Value,
   operator: string,
+  formatDate: DateFormatter,
   dateOp?: DateOp,
 ) => {
   if (operator === 'is null' || operator === 'is not null') {
@@ -86,10 +80,11 @@ const isAssociatedQuery = (query: Query): query is AssociatedQuery =>
 const buildWhereClause = (
   query: Query,
   fieldOptions: FieldOption[],
+  formatDate: DateFormatter,
 ): string => {
   if (isRootQuery(query)) {
     return `(${query.rules
-      .map(q => buildWhereClause(q, fieldOptions))
+      .map(q => buildWhereClause(q, fieldOptions, formatDate))
       .join(` ${query.combinator.toUpperCase()} `)})`;
   }
 
@@ -99,7 +94,8 @@ const buildWhereClause = (
       'string',
       associationType,
       '=',
-    )} and ${buildWhereClause(innerQuery, fieldOptions)}`;
+      formatDate,
+    )} and ${buildWhereClause(innerQuery, fieldOptions, formatDate)}`;
   }
 
   const { type } = fieldOptions.find(a => a.name === query.field) || {};
@@ -110,10 +106,14 @@ const buildWhereClause = (
     );
   }
 
-  const value = getValue(type, query.value, query.operator, query.date);
+  const value = getValue(type, query.value, query.operator, formatDate, query.date);
 
   return `${query.field} ${query.operator}${value}`;
 };
 
-export const where = (query: RootQuery, fieldOptions: FieldOption[]) =>
-  query.rules.length ? `${buildWhereClause(query, fieldOptions)}` : '';
+const createQueryBuilder = (formatDate: DateFormatter) => ({
+  where: (query: RootQuery, fieldOptions: FieldOption[]) =>
+    query.rules.length ? `${buildWhereClause(query, fieldOptions, formatDate)}` : '',
+});
+
+export default createQueryBuilder;
