@@ -58,9 +58,7 @@ const getValue = (
   switch (type) {
     case 'date':
       if (!dateOp) {
-        throw new Error(
-          `No date op provided for date condition with value of ${value}`,
-        );
+        return ` Error: no date op provided for date condition with value of ${value}`;
       }
 
       return dateOp === 'CALENDAR'
@@ -116,9 +114,7 @@ const buildWhereClause = (
   const { type } = fieldOptions.find(a => a.name === query.field) || {};
 
   if (!type) {
-    throw new Error(
-      `Corresponding field option not found for field ${query.field}`,
-    );
+    return `Error: corresponding field option not found for field ${query.field}`;
   }
 
   const value = getValue(
