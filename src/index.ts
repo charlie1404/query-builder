@@ -94,7 +94,11 @@ const buildWhereClause = (
 
   if (isAssociatedQuery(query)) {
     const { associationTypeFieldName, associationType, ...innerQuery } = query;
-    return `${associationTypeFieldName} =${getValue('string', associationType, '=')} and ${buildWhereClause(innerQuery, fieldOptions)}`
+    return `${associationTypeFieldName} =${getValue(
+      'string',
+      associationType,
+      '=',
+    )} and ${buildWhereClause(innerQuery, fieldOptions)}`;
   }
 
   const { type } = fieldOptions.find(a => a.name === query.field) || {};
