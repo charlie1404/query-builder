@@ -1,6 +1,6 @@
 # Query Builder
 
-Builds SQL query strings from AIS-conformant query and filter field objects.
+Builds SQL strings from AIS-conformant query trees.
 
 ```ts
 import createQueryBuilder from '@peak-ai/query-builder';

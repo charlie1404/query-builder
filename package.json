@@ -1,7 +1,7 @@
 {
   "name": "@peak-ai/query-builder",
-  "version": "0.1.1",
-  "description": "Builds SQL query strings from AIS-conformant query and filter field objects",
+  "version": "0.1.2",
+  "description": "Builds SQL strings from AIS-conformant query trees",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
