@@ -55,6 +55,14 @@ const DATE_OP_MAP = {
   SUBTRACT: '-',
 };
 
+const handleMissingValue = ({ mode }: BuilderOptions, reason: string, displayFallback = '') => {
+  if (mode === Mode.Validation) {
+    throw new Error(reason);
+  }
+
+  return displayFallback;
+};
+
 const mapDateOp = (date: Date, dateOp: Exclude<DateOp, 'CALENDAR'>) =>
   ` (CURRENT_DATE ${DATE_OP_MAP[dateOp]} ${date})`;
 
@@ -142,17 +150,21 @@ const buildWhereClause = (
   return `${query.field} ${query.operator}${value}`;
 };
 
-const createQueryBuilder = (options: BuilderOptions) => ({
-  where: (query: RootQuery, fieldOptions: FieldOption[]) => {
-    if (!hasRules(query)) {
-      throw new Error('Root query has no rules');
-    }
+const createQueryBuilder = (userOptions: BuilderOptions) => {
+  const options = {
+    ...defaultOptions,
+    ...userOptions,
+  };
 
-    return `${buildWhereClause(query, fieldOptions, {
-      ...defaultOptions,
-      ...options,
-    })}`;
-  }
-});
+  return {
+    where: (query: RootQuery, fieldOptions: FieldOption[]) => {
+      if (!hasRules(query)) {
+        return handleMissingValue(options, 'Root query has no rules', '()');
+      }
+
+      return `${buildWhereClause(query, fieldOptions, options)}`;
+    }
+  };
+};
 
 export default createQueryBuilder;

@@ -413,6 +413,25 @@ describe('Query Builder', () => {
       mode: Mode.Display,
     });
 
-    it.todo('should render an empty pair of parens when rules are not defined');
+    describe('where()', () => {
+      it('should return an empty pair of parens when rules are not defined', () => {
+        const query = {
+          id: '1',
+          combinator: 'or',
+        };
+
+        expect(queryBuilder.where(query, [])).toBe('()');
+      });
+
+      it('should return an empty pair of parens when rules are empty', () => {
+        const query = {
+          id: '1',
+          combinator: 'or',
+          rules: [],
+        };
+
+        expect(queryBuilder.where(query, [])).toBe('()');
+      });
+    });
   });
 });
