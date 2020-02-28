@@ -76,7 +76,7 @@ import createQueryBuilder, { Mode } from '@peak-ai/query-builder';
 If you're using CommonJS, this means you'll have to destructure and rename the `default` binding:
 
 ```ts
-const { default: createQueryBuilder } = require('@peak-ai/query-builder');
+const { default: createQueryBuilder, Mode } = require('@peak-ai/query-builder');
 ```
 
 ## API
