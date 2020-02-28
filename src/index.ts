@@ -71,7 +71,6 @@ const handleMissingValue = (
   return displayFallback;
 };
 
-// TODO: more accurate name
 const validateQuery = (
   query: StandardQuery,
   options: BuilderOptions,
