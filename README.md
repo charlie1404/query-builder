@@ -52,8 +52,8 @@ const query = {
   ],
 };
 
-const formatDate = (date: Date) => moment(date).format('YYYY-MM-DD');
-const queryBuilder = createQueryBuilder(formatDate);
+const dateFormatter = (date: Date) => moment(date).format('YYYY-MM-DD');
+const queryBuilder = createQueryBuilder({ dateFormatter });
 
 console.log(queryBuilder.where(query, fieldOptions));
 // => `(useremail = 'joebloggs@gmail.com' AND (ordercount > 20 OR customergender = 'male'))`
