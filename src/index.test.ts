@@ -539,7 +539,62 @@ describe('Query Builder', () => {
           ],
         };
 
-        const expectedClause = `(useremail = '')`;
+        const expectedClause = `(useremail =)`;
+
+        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+      });
+
+      it('should only render the association type clause if the subsequent value clauses is empty', () => {
+        const fieldOptions = [
+          {
+            name: 'associationvalue',
+            type: 'small',
+            label: 'Brand',
+            autocomplete: true,
+          },
+        ];
+
+        const query = {
+          id: '1',
+          combinator: 'and',
+          rules: [
+            {
+              associationTypeFieldName: 'associationtype',
+              associationType: 'Brand',
+              id: '1',
+            },
+          ],
+        };
+
+        const expectedClause = `(associationtype = 'Brand')`;
+
+        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+      });
+
+      it('should only render the association type clause and field if the other parts are missing', () => {
+        const fieldOptions = [
+          {
+            name: 'associationvalue',
+            type: 'small',
+            label: 'Brand',
+            autocomplete: true,
+          },
+        ];
+
+        const query = {
+          id: '1',
+          combinator: 'and',
+          rules: [
+            {
+              associationTypeFieldName: 'associationtype',
+              associationType: 'Brand',
+              id: '1',
+              field: 'associationvalue',
+            },
+          ],
+        };
+
+        const expectedClause = `(associationtype = 'Brand' and associationvalue)`;
 
         expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
       });

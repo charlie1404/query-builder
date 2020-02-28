@@ -82,10 +82,14 @@ const mapDateOp = (date: Date, dateOp: Exclude<DateOp, 'CALENDAR'>) =>
 const getValue = (
   options: BuilderOptions,
   type = '',
-  value: Value = '',
   operator = '',
+  value?: Value,
   dateOp?: DateOp,
 ) => {
+  if (!value) {
+    return '';
+  }
+
   if (operator === 'is null' || operator === 'is not null') {
     return '';
   }
@@ -136,15 +140,16 @@ const buildWhereClause = (
       .join(` ${query.combinator.toUpperCase()} `)})`;
   }
 
-  // TODO: validate these bad boys
   if (isAssociatedQuery(query)) {
     const { associationTypeFieldName, associationType, ...innerQuery } = query;
+    const clause = buildWhereClause(innerQuery, fieldOptions, builderOptions);
+
     return `${associationTypeFieldName} = ${getValue(
       builderOptions,
       'string',
-      associationType,
       '=',
-    )} and ${buildWhereClause(innerQuery, fieldOptions, builderOptions)}`;
+      associationType,
+    )}${clause ? ` and ${clause}` : ''}`;
   }
 
   const validatedQuery = validateQuery(query, builderOptions);
@@ -158,8 +163,8 @@ const buildWhereClause = (
   const value = getValue(
     builderOptions,
     type,
-    validatedQuery.value,
     validatedQuery.operator,
+    validatedQuery.value,
     validatedQuery.date,
   );
 
