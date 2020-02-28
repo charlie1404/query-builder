@@ -1,402 +1,418 @@
 import * as moment from 'moment';
-import createQueryBuilder from './';
+import createQueryBuilder, { Mode } from './';
 
 describe('Query Builder', () => {
   const dateFormatter = (date: Date) => moment(date).format('YYYY-MM-DD');
 
-  const queryBuilder = createQueryBuilder({
-    dateFormatter,
-  });
-
-  describe('where()', () => {
-    it('should concatenate field names, operators, and values into an SQL where clause', () => {
-      const fieldOptions = [
-        {
-          name: 'predltv',
-          type: 'smallint',
-        },
-        {
-          name: 'ordercount',
-          type: 'integer',
-        },
-      ];
-
-      const query = {
-        id: '1',
-        combinator: 'and',
-        rules: [
-          {
-            id: '1',
-            value: '2000',
-            field: 'predltv',
-            operator: '=',
-          },
-          {
-            id: '2',
-            value: '5',
-            field: 'ordercount',
-            operator: '>',
-          },
-        ],
-      };
-
-      const expectedClause = '(predltv = 2000 AND ordercount > 5)';
-
-      expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+  describe('Mode = Validation', () => {
+    // Validation is the default mode
+    const queryBuilder = createQueryBuilder({
+      dateFormatter,
     });
 
-    it('should wrap string values in SQL wildcards when the operator is `ilike`', () => {
-      const fieldOptions = [
-        {
-          name: 'useremail',
-          type: 'string',
-        },
-      ];
-
-      const query = {
-        id: '1',
-        combinator: 'and',
-        rules: [
+    describe('where()', () => {
+      it('should concatenate field names, operators, and values into an SQL where clause', () => {
+        const fieldOptions = [
           {
-            id: '1',
-            value: 'joebloggs',
-            field: 'useremail',
-            operator: 'ilike',
+            name: 'predltv',
+            type: 'smallint',
           },
-        ],
-      };
-
-      const expectedClause = '(useremail ilike %joebloggs%)';
-
-      expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
-    });
-
-    it('should wrap string values in SQL wildcards when the operator is `not ilike`', () => {
-      const fieldOptions = [
-        {
-          name: 'useremail',
-          type: 'string',
-        },
-      ];
-
-      const query = {
-        id: '1',
-        combinator: 'and',
-        rules: [
           {
-            id: '1',
-            value: 'joebloggs',
-            field: 'useremail',
-            operator: 'not ilike',
+            name: 'ordercount',
+            type: 'integer',
           },
-        ],
-      };
+        ];
 
-      const expectedClause = '(useremail not ilike %joebloggs%)';
+        const query = {
+          id: '1',
+          combinator: 'and',
+          rules: [
+            {
+              id: '1',
+              value: '2000',
+              field: 'predltv',
+              operator: '=',
+            },
+            {
+              id: '2',
+              value: '5',
+              field: 'ordercount',
+              operator: '>',
+            },
+          ],
+        };
 
-      expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
-    });
+        const expectedClause = '(predltv = 2000 AND ordercount > 5)';
 
-    it('should format the value as a date when when the type is `date` and the date operator is `CALENDAR`', () => {
-      const fieldOptions = [
-        {
-          name: 'dob',
-          type: 'date',
-        },
-      ];
-
-      const query = {
-        id: '1',
-        combinator: 'or',
-        rules: [
-          {
-            id: '1',
-            value: new Date(1582735631000),
-            field: 'dob',
-            operator: '=',
-            date: 'CALENDAR' as const,
-          },
-        ],
-      };
-
-      const expectedClause = `(dob = '2020-02-26')`;
-
-      expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
-    });
-
-    it('should compute a date add operation when the date operator is `ADD`', () => {
-      const fieldOptions = [
-        {
-          name: 'dob',
-          type: 'date',
-        },
-      ];
-
-      const query = {
-        id: '1',
-        combinator: 'or',
-        rules: [
-          {
-            id: '1',
-            value: 'run date',
-            field: 'dob',
-            operator: '=',
-            date: 'ADD' as const,
-          },
-        ],
-      };
-
-      const expectedClause = `(dob = (CURRENT_DATE + run date))`;
-
-      expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
-    });
-
-    it('should compute a date subtract operation when the date operator is `SUBTRACT`', () => {
-      const fieldOptions = [
-        {
-          name: 'dob',
-          type: 'date',
-        },
-      ];
-
-      const query = {
-        id: '1',
-        combinator: 'or',
-        rules: [
-          {
-            id: '1',
-            value: 'run date',
-            field: 'dob',
-            operator: '=',
-            date: 'SUBTRACT' as const,
-          },
-        ],
-      };
-
-      const expectedClause = `(dob = (CURRENT_DATE - run date))`;
-
-      expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
-    });
-
-    it('should support different date formatters', () => {
-      const gbFormatter = (date: Date) => moment(date).format('DD/MM/YYYY');
-
-      const gbBuilder = createQueryBuilder({
-        dateFormatter: gbFormatter,
+        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
       });
 
-      const fieldOptions = [
-        {
-          name: 'dob',
-          type: 'date',
-        },
-      ];
-
-      const query = {
-        id: '1',
-        combinator: 'or',
-        rules: [
+      it('should wrap string values in SQL wildcards when the operator is `ilike`', () => {
+        const fieldOptions = [
           {
-            id: '1',
-            value: new Date(1582735631000),
-            field: 'dob',
-            operator: '=',
-            date: 'CALENDAR' as const,
+            name: 'useremail',
+            type: 'string',
           },
-        ],
-      };
+        ];
 
-      const expectedClause = `(dob = '26/02/2020')`;
+        const query = {
+          id: '1',
+          combinator: 'and',
+          rules: [
+            {
+              id: '1',
+              value: 'joebloggs',
+              field: 'useremail',
+              operator: 'ilike',
+            },
+          ],
+        };
 
-      expect(gbBuilder.where(query, fieldOptions)).toBe(expectedClause);
-    });
+        const expectedClause = '(useremail ilike %joebloggs%)';
 
-    it('should build associative clauses when the query has associationType and associationField properties', () => {
-      const fieldOptions = [
-        {
-          name: 'associationvalue',
-          type: 'small',
-          label: 'Brand',
-          autocomplete: true,
-        },
-      ];
+        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+      });
 
-      const query = {
-        id: '1',
-        combinator: 'and',
-        rules: [
+      it('should wrap string values in SQL wildcards when the operator is `not ilike`', () => {
+        const fieldOptions = [
           {
-            associationTypeFieldName: 'associationtype',
-            associationType: 'Brand',
-            field: 'associationvalue',
-            id: '1',
-            operator: '=',
-            value: 'Nike',
+            name: 'useremail',
+            type: 'string',
           },
-        ],
-      };
+        ];
 
-      const expectedClause = `(associationtype = 'Brand' and associationvalue = 'Nike')`;
+        const query = {
+          id: '1',
+          combinator: 'and',
+          rules: [
+            {
+              id: '1',
+              value: 'joebloggs',
+              field: 'useremail',
+              operator: 'not ilike',
+            },
+          ],
+        };
 
-      expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
-    });
+        const expectedClause = '(useremail not ilike %joebloggs%)';
 
-    /* This test is required as GraphQL will resolve
-     * optional fields to `null` when the underlying
-     * items don't have values for them. */
-    it('should treat rules regularly when the association props are present but null', () => {
-      const fieldOptions = [
-        {
-          name: 'brand',
-          type: 'small',
-          label: 'Brand',
-          autocomplete: true,
-        },
-      ];
+        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+      });
 
-      const query = {
-        id: '1',
-        combinator: 'and',
-        rules: [
+      it('should format the value as a date when when the type is `date` and the date operator is `CALENDAR`', () => {
+        const fieldOptions = [
           {
-            associationTypeFieldName: null,
-            associationType: null,
-            field: 'brand',
-            id: '1',
-            operator: '=',
-            value: 'Nike',
+            name: 'dob',
+            type: 'date',
           },
-        ],
-      };
+        ];
 
-      const expectedClause = `(brand = 'Nike')`;
+        const query = {
+          id: '1',
+          combinator: 'or',
+          rules: [
+            {
+              id: '1',
+              value: new Date(1582735631000),
+              field: 'dob',
+              operator: '=',
+              date: 'CALENDAR' as const,
+            },
+          ],
+        };
 
-      expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
-    });
+        const expectedClause = `(dob = '2020-02-26')`;
 
-    it('should support nested rule groups', () => {
-      const fieldOptions = [
-        {
-          name: 'useremail',
-          type: 'large',
-        },
-        {
-          name: 'ordercount',
-          type: 'integer',
-        },
-        {
-          name: 'customergender',
-          type: 'small',
-        },
-      ];
+        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+      });
 
-      const query = {
-        id: '1',
-        combinator: 'and',
-        rules: [
+      it('should compute a date add operation when the date operator is `ADD`', () => {
+        const fieldOptions = [
           {
-            id: '1',
-            field: 'useremail',
-            value: 'joebloggs@gmail.com',
-            operator: '=',
+            name: 'dob',
+            type: 'date',
+          },
+        ];
+
+        const query = {
+          id: '1',
+          combinator: 'or',
+          rules: [
+            {
+              id: '1',
+              value: 'run date',
+              field: 'dob',
+              operator: '=',
+              date: 'ADD' as const,
+            },
+          ],
+        };
+
+        const expectedClause = `(dob = (CURRENT_DATE + run date))`;
+
+        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+      });
+
+      it('should compute a date subtract operation when the date operator is `SUBTRACT`', () => {
+        const fieldOptions = [
+          {
+            name: 'dob',
+            type: 'date',
+          },
+        ];
+
+        const query = {
+          id: '1',
+          combinator: 'or',
+          rules: [
+            {
+              id: '1',
+              value: 'run date',
+              field: 'dob',
+              operator: '=',
+              date: 'SUBTRACT' as const,
+            },
+          ],
+        };
+
+        const expectedClause = `(dob = (CURRENT_DATE - run date))`;
+
+        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+      });
+
+      it('should support different date formatters', () => {
+        const gbFormatter = (date: Date) => moment(date).format('DD/MM/YYYY');
+
+        const gbBuilder = createQueryBuilder({
+          dateFormatter: gbFormatter,
+        });
+
+        const fieldOptions = [
+          {
+            name: 'dob',
+            type: 'date',
+          },
+        ];
+
+        const query = {
+          id: '1',
+          combinator: 'or',
+          rules: [
+            {
+              id: '1',
+              value: new Date(1582735631000),
+              field: 'dob',
+              operator: '=',
+              date: 'CALENDAR' as const,
+            },
+          ],
+        };
+
+        const expectedClause = `(dob = '26/02/2020')`;
+
+        expect(gbBuilder.where(query, fieldOptions)).toBe(expectedClause);
+      });
+
+      it('should build associative clauses when the query has associationType and associationField properties', () => {
+        const fieldOptions = [
+          {
+            name: 'associationvalue',
+            type: 'small',
+            label: 'Brand',
+            autocomplete: true,
+          },
+        ];
+
+        const query = {
+          id: '1',
+          combinator: 'and',
+          rules: [
+            {
+              associationTypeFieldName: 'associationtype',
+              associationType: 'Brand',
+              field: 'associationvalue',
+              id: '1',
+              operator: '=',
+              value: 'Nike',
+            },
+          ],
+        };
+
+        const expectedClause = `(associationtype = 'Brand' and associationvalue = 'Nike')`;
+
+        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+      });
+
+      /* This test is required as GraphQL will resolve
+      * optional fields to `null` when the underlying
+      * items don't have values for them. */
+      it('should treat rules regularly when the association props are present but null', () => {
+        const fieldOptions = [
+          {
+            name: 'brand',
+            type: 'small',
+            label: 'Brand',
+            autocomplete: true,
+          },
+        ];
+
+        const query = {
+          id: '1',
+          combinator: 'and',
+          rules: [
+            {
+              associationTypeFieldName: null,
+              associationType: null,
+              field: 'brand',
+              id: '1',
+              operator: '=',
+              value: 'Nike',
+            },
+          ],
+        };
+
+        const expectedClause = `(brand = 'Nike')`;
+
+        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+      });
+
+      it('should support nested rule groups', () => {
+        const fieldOptions = [
+          {
+            name: 'useremail',
+            type: 'large',
           },
           {
-            id: '2',
-            combinator: 'or',
-            rules: [
-              {
-                id: '2',
-                field: 'ordercount',
-                value: '20',
-                operator: '>',
-              },
-              {
-                id: '3',
-                field: 'customergender',
-                value: 'male',
-                operator: '=',
-              },
-            ],
+            name: 'ordercount',
+            type: 'integer',
           },
-        ],
-      };
-
-      const expectedClause = `(useremail = 'joebloggs@gmail.com' AND (ordercount > 20 OR customergender = 'male'))`;
-
-      expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
-    });
-
-    it('should throw an error when there isn`t a field option for a given query type', () => {
-      const fieldOptions = [
-        {
-          name: 'Foo',
-          type: 'string',
-        },
-      ];
-
-      const query = {
-        id: '1',
-        combinator: 'and',
-        rules: [
           {
-            id: '1',
-            value: 'joebloggs',
-            field: 'useremail',
-            operator: 'not ilike',
+            name: 'customergender',
+            type: 'small',
           },
-        ],
-      };
+        ];
 
-      expect(() => queryBuilder.where(query, fieldOptions)).toThrow(
-        new Error('Corresponding field option not found for field useremail'),
-      );
-    });
+        const query = {
+          id: '1',
+          combinator: 'and',
+          rules: [
+            {
+              id: '1',
+              field: 'useremail',
+              value: 'joebloggs@gmail.com',
+              operator: '=',
+            },
+            {
+              id: '2',
+              combinator: 'or',
+              rules: [
+                {
+                  id: '2',
+                  field: 'ordercount',
+                  value: '20',
+                  operator: '>',
+                },
+                {
+                  id: '3',
+                  field: 'customergender',
+                  value: 'male',
+                  operator: '=',
+                },
+              ],
+            },
+          ],
+        };
 
-    it('should throw an error for a date query when the date op isn`t provided', () => {
-      const fieldOptions = [
-        {
-          name: 'dob',
-          type: 'date',
-        },
-      ];
+        const expectedClause = `(useremail = 'joebloggs@gmail.com' AND (ordercount > 20 OR customergender = 'male'))`;
 
-      const query = {
-        id: '1',
-        combinator: 'or',
-        rules: [
+        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+      });
+
+      it('should throw an error when there isn`t a field option for a given query type', () => {
+        const fieldOptions = [
           {
-            id: '1',
-            value: 'run date',
-            field: 'dob',
-            operator: '=',
+            name: 'Foo',
+            type: 'string',
           },
-        ],
-      };
+        ];
 
-      expect(() => queryBuilder.where(query, fieldOptions)).toThrow(
-        new Error('No date op provided for date condition with value of run date'),
-      );
+        const query = {
+          id: '1',
+          combinator: 'and',
+          rules: [
+            {
+              id: '1',
+              value: 'joebloggs',
+              field: 'useremail',
+              operator: 'not ilike',
+            },
+          ],
+        };
+
+        expect(() => queryBuilder.where(query, fieldOptions)).toThrow(
+          new Error('Corresponding field option not found for field useremail'),
+        );
+      });
+
+      it('should throw an error for a date query when the date op isn`t provided', () => {
+        const fieldOptions = [
+          {
+            name: 'dob',
+            type: 'date',
+          },
+        ];
+
+        const query = {
+          id: '1',
+          combinator: 'or',
+          rules: [
+            {
+              id: '1',
+              value: 'run date',
+              field: 'dob',
+              operator: '=',
+            },
+          ],
+        };
+
+        expect(() => queryBuilder.where(query, fieldOptions)).toThrow(
+          new Error('No date op provided for date condition with value of run date'),
+        );
+      });
+
+      it('should throw an error if there are no rules on the root query', () => {
+        const query = {
+          id: '1',
+          combinator: 'or',
+          rules: [],
+        };
+
+        expect(() => queryBuilder.where(query, [])).toThrow(
+          new Error('Root query has no rules'),
+        );
+      });
+
+      /* Required as query passed via props
+      * doesn't have an initial default */
+      it('should throw an error if top-level rules array is undefined', () => {
+        const query = {
+          id: '1',
+          combinator: 'or',
+        };
+
+        expect(() => queryBuilder.where(query, [])).toThrow(
+          new Error('Root query has no rules'),
+        );
+      });
+    });
+  });
+
+  describe('Mode = Display', () => {
+    const queryBuilder = createQueryBuilder({
+      dateFormatter,
+      mode: Mode.Display,
     });
 
-    it('should return an empty string if there are no rules on the root query', () => {
-      const query = {
-        id: '1',
-        combinator: 'or',
-        rules: [],
-      };
-
-      expect(queryBuilder.where(query, [])).toBe('');
-    });
-
-    /* Required as query passed via props
-     * doesn't have an initial default */
-    it('should return an empty string if top-level rules array is undefined', () => {
-      const query = {
-        id: '1',
-        combinator: 'or',
-      };
-
-      expect(queryBuilder.where(query, [])).toBe('');
-    });
+    it.todo('should render an empty pair of parens when rules are not defined');
   });
 });

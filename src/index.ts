@@ -2,7 +2,7 @@ type DateFormatter = (date: Date) => string;
 type DateOp = 'ADD' | 'SUBTRACT' | 'CALENDAR';
 type Value = string | Date;
 
-enum Mode {
+export enum Mode {
   Display, // for building strings that are rendered on the frontend
   Validation, // for validating complete queries, throwing an error when incomplete
 }
@@ -143,13 +143,16 @@ const buildWhereClause = (
 };
 
 const createQueryBuilder = (options: BuilderOptions) => ({
-  where: (query: RootQuery, fieldOptions: FieldOption[]) =>
-    hasRules(query)
-      ? `${buildWhereClause(query, fieldOptions, {
-        ...defaultOptions,
-        ...options,
-      })}`
-      : '',
+  where: (query: RootQuery, fieldOptions: FieldOption[]) => {
+    if (!hasRules(query)) {
+      throw new Error('Root query has no rules');
+    }
+
+    return `${buildWhereClause(query, fieldOptions, {
+      ...defaultOptions,
+      ...options,
+    })}`;
+  }
 });
 
 export default createQueryBuilder;
