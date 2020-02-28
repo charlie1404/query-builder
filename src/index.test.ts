@@ -2,8 +2,11 @@ import * as moment from 'moment';
 import createQueryBuilder from './';
 
 describe('Query Builder', () => {
-  const formatDate = (date: Date) => moment(date).format('YYYY-MM-DD');
-  const queryBuilder = createQueryBuilder(formatDate);
+  const dateFormatter = (date: Date) => moment(date).format('YYYY-MM-DD');
+
+  const queryBuilder = createQueryBuilder({
+    dateFormatter,
+  });
 
   describe('where()', () => {
     it('should concatenate field names, operators, and values into an SQL where clause', () => {
@@ -177,7 +180,10 @@ describe('Query Builder', () => {
 
     it('should support different date formatters', () => {
       const gbFormatter = (date: Date) => moment(date).format('DD/MM/YYYY');
-      const gbBuilder = createQueryBuilder(gbFormatter);
+
+      const gbBuilder = createQueryBuilder({
+        dateFormatter: gbFormatter,
+      });
 
       const fieldOptions = [
         {

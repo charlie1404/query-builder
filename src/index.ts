@@ -2,6 +2,20 @@ type DateFormatter = (date: Date) => string;
 type DateOp = 'ADD' | 'SUBTRACT' | 'CALENDAR';
 type Value = string | Date;
 
+enum Mode {
+  Display, // for building strings that are rendered on the frontend
+  Validation, // for validating complete queries, throwing an error when incomplete
+}
+
+interface BuilderOptions {
+  dateFormatter: DateFormatter;
+  mode?: Mode;
+}
+
+const defaultOptions = {
+  mode: Mode.Validation,
+};
+
 interface RootQuery {
   id: string;
   combinator: string;
@@ -48,7 +62,7 @@ const getValue = (
   type: string,
   value: Value,
   operator: string,
-  formatDate: DateFormatter,
+  { dateFormatter }: BuilderOptions,
   dateOp?: DateOp,
 ) => {
   if (operator === 'is null' || operator === 'is not null') {
@@ -62,7 +76,7 @@ const getValue = (
       }
 
       return dateOp === 'CALENDAR'
-        ? ` '${formatDate(value as Date)}'`
+        ? ` '${dateFormatter(value as Date)}'`
         : mapDateOp(value as Date, dateOp);
 
     case 'string':
@@ -93,11 +107,11 @@ const hasRules = (query: RootQuery): query is DefinedRootQuery =>
 const buildWhereClause = (
   query: DefinedQuery,
   fieldOptions: FieldOption[],
-  formatDate: DateFormatter,
+  builderOptions: BuilderOptions,
 ): string => {
   if (isDefinedRootQuery(query)) {
     return `(${query.rules
-      .map(q => buildWhereClause(q, fieldOptions, formatDate))
+      .map(q => buildWhereClause(q, fieldOptions, builderOptions))
       .join(` ${query.combinator.toUpperCase()} `)})`;
   }
 
@@ -107,8 +121,8 @@ const buildWhereClause = (
       'string',
       associationType,
       '=',
-      formatDate,
-    )} and ${buildWhereClause(innerQuery, fieldOptions, formatDate)}`;
+      builderOptions,
+    )} and ${buildWhereClause(innerQuery, fieldOptions, builderOptions)}`;
   }
 
   const { type } = fieldOptions.find(a => a.name === query.field) || {};
@@ -121,17 +135,20 @@ const buildWhereClause = (
     type,
     query.value,
     query.operator,
-    formatDate,
+    builderOptions,
     query.date,
   );
 
   return `${query.field} ${query.operator}${value}`;
 };
 
-const createQueryBuilder = (formatDate: DateFormatter) => ({
+const createQueryBuilder = (options: BuilderOptions) => ({
   where: (query: RootQuery, fieldOptions: FieldOption[]) =>
     hasRules(query)
-      ? `${buildWhereClause(query, fieldOptions, formatDate)}`
+      ? `${buildWhereClause(query, fieldOptions, {
+        ...defaultOptions,
+        ...options,
+      })}`
       : '',
 });
 
