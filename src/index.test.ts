@@ -347,8 +347,8 @@ describe('Query Builder', () => {
         ],
       };
 
-      expect(queryBuilder.where(query, fieldOptions)).toBe(
-        '(Error: corresponding field option not found for field useremail)',
+      expect(() => queryBuilder.where(query, fieldOptions)).toThrow(
+        new Error('Corresponding field option not found for field useremail'),
       );
     });
 
@@ -373,8 +373,8 @@ describe('Query Builder', () => {
         ],
       };
 
-      expect(queryBuilder.where(query, fieldOptions)).toBe(
-        '(dob = Error: no date op provided for date condition with value of run date)',
+      expect(() => queryBuilder.where(query, fieldOptions)).toThrow(
+        new Error('No date op provided for date condition with value of run date'),
       );
     });
 
