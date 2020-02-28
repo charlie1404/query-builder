@@ -80,7 +80,7 @@ const mapDateOp = (date: Date, dateOp: Exclude<DateOp, 'CALENDAR'>) =>
   `(CURRENT_DATE ${DATE_OP_MAP[dateOp]} ${date})`;
 
 const getValue = (
-  { dateFormatter }: BuilderOptions,
+  options: BuilderOptions,
   type = '',
   value: Value = '',
   operator = '',
@@ -93,11 +93,11 @@ const getValue = (
   switch (type) {
     case 'date':
       if (!dateOp) {
-        throw new Error(`No date op provided for date condition with value of ${value}`);
+        return handleMissingValue(options, `No date op provided for date condition with value of ${value}`);
       }
 
       return dateOp === 'CALENDAR'
-        ? `'${dateFormatter(value as Date)}'`
+        ? `'${options.dateFormatter(value as Date)}'`
         : mapDateOp(value as Date, dateOp);
 
     case 'string':

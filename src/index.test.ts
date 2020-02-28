@@ -434,6 +434,20 @@ describe('Query Builder', () => {
       });
 
       it('should render empty parens if there`s a rule with no values', () => {
+        const query = {
+          id: '1',
+          combinator: 'or',
+          rules: [
+            {
+              id: '1',
+            },
+          ],
+        };
+
+        expect(queryBuilder.where(query, [])).toBe('()');
+      });
+
+      it('should only render the field if the operator and value are missing', () => {
         const fieldOptions = [
           {
             name: 'dob',
@@ -447,11 +461,87 @@ describe('Query Builder', () => {
           rules: [
             {
               id: '1',
+              field: 'dob',
             },
           ],
         };
 
-        expect(queryBuilder.where(query, fieldOptions)).toBe('()');
+        const expectedClause = '(dob)';
+
+        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+      });
+
+      it('should only render the operator if the field and value are missing', () => {
+        const fieldOptions = [
+          {
+            name: 'dob',
+            type: 'date',
+          },
+        ];
+
+        const query = {
+          id: '1',
+          combinator: 'or',
+          rules: [
+            {
+              id: '1',
+              operator: '=',
+            },
+          ],
+        };
+
+        const expectedClause = '(=)';
+
+        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+      });
+
+      it('should only render the value if the field and operator are missing', () => {
+        const fieldOptions = [
+          {
+            name: 'dob',
+            type: 'date',
+          },
+        ];
+
+        const query = {
+          id: '1',
+          combinator: 'or',
+          rules: [
+            {
+              id: '1',
+              value: '10',
+            },
+          ],
+        };
+
+        const expectedClause = '(10)';
+
+        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+      });
+
+      it('should only render the field and operator if the value is missing', () => {
+        const fieldOptions = [
+          {
+            name: 'useremail',
+            type: 'medium',
+          },
+        ];
+
+        const query = {
+          id: '1',
+          combinator: 'or',
+          rules: [
+            {
+              id: '1',
+              field: 'useremail',
+              operator: '=',
+            },
+          ],
+        };
+
+        const expectedClause = `(useremail = '')`;
+
+        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
       });
     });
   });
