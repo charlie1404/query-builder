@@ -244,8 +244,8 @@ describe('Query Builder', () => {
       });
 
       /* This test is required as GraphQL will resolve
-      * optional fields to `null` when the underlying
-      * items don't have values for them. */
+       * optional fields to `null` when the underlying
+       * items don't have values for them. */
       it('should treat rules regularly when the association props are present but null', () => {
         const fieldOptions = [
           {
@@ -376,7 +376,9 @@ describe('Query Builder', () => {
         };
 
         expect(() => queryBuilder.where(query, fieldOptions)).toThrow(
-          new Error('No date op provided for date condition with value of run date'),
+          new Error(
+            'No date op provided for date condition with value of run date',
+          ),
         );
       });
 
@@ -393,7 +395,7 @@ describe('Query Builder', () => {
       });
 
       /* Required as query passed via props
-      * doesn't have an initial default */
+       * doesn't have an initial default */
       it('should throw an error if top-level rules array is undefined', () => {
         const query = {
           id: '1',

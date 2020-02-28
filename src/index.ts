@@ -59,7 +59,11 @@ const DATE_OP_MAP = {
   SUBTRACT: '-',
 };
 
-const handleMissingValue = ({ mode }: BuilderOptions, reason: string, displayFallback = '') => {
+const handleMissingValue = (
+  { mode }: BuilderOptions,
+  reason: string,
+  displayFallback = '',
+) => {
   if (mode === Mode.Validation) {
     throw new Error(reason);
   }
@@ -68,10 +72,17 @@ const handleMissingValue = ({ mode }: BuilderOptions, reason: string, displayFal
 };
 
 // TODO: more accurate name
-const validateQuery = (query: StandardQuery, options: BuilderOptions): StandardQuery => ({
+const validateQuery = (
+  query: StandardQuery,
+  options: BuilderOptions,
+): StandardQuery => ({
   id: query.id,
-  field: query.field || handleMissingValue(options, `No field for query ${query.id}`),
-  operator: query.operator || handleMissingValue(options, `No operator for query ${query.id}`),
+  field:
+    query.field ||
+    handleMissingValue(options, `No field for query ${query.id}`),
+  operator:
+    query.operator ||
+    handleMissingValue(options, `No operator for query ${query.id}`),
   value: query.value, // validated by getValue
   date: query.date,
 });
@@ -97,7 +108,10 @@ const getValue = (
   switch (type) {
     case 'date':
       if (!dateOp) {
-        return handleMissingValue(options, `No date op provided for date condition with value of ${value}`);
+        return handleMissingValue(
+          options,
+          `No date op provided for date condition with value of ${value}`,
+        );
       }
 
       return dateOp === 'CALENDAR'
@@ -154,10 +168,14 @@ const buildWhereClause = (
 
   const validatedQuery = validateQuery(query, builderOptions);
 
-  const { type } = fieldOptions.find(a => a.name === validatedQuery.field) || {};
+  const { type } =
+    fieldOptions.find(a => a.name === validatedQuery.field) || {};
 
   if (!type) {
-    handleMissingValue(builderOptions, `Corresponding field option not found for field ${query.field}`);
+    handleMissingValue(
+      builderOptions,
+      `Corresponding field option not found for field ${query.field}`,
+    );
   }
 
   const value = getValue(
@@ -186,7 +204,7 @@ const createQueryBuilder = (userOptions: BuilderOptions) => {
       }
 
       return `${buildWhereClause(query, fieldOptions, options)}`;
-    }
+    },
   };
 };
 
