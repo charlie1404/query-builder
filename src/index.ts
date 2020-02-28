@@ -30,11 +30,15 @@ interface DefinedRootQuery extends RootQuery {
   rules: DefinedQuery[];
 }
 
+/* Most of the fields are optional
+ * as unpopulated rules can be created
+ * on the frontend, for which we must
+ * build some sort of output string */
 interface StandardQuery {
   id: string;
-  field: string;
-  operator: string;
-  value: Value;
+  field?: string;
+  operator?: string;
+  value?: Value;
   date?: DateOp;
 }
 
@@ -63,14 +67,23 @@ const handleMissingValue = ({ mode }: BuilderOptions, reason: string, displayFal
   return displayFallback;
 };
 
+// TODO: more accurate name
+const validateQuery = (query: StandardQuery, options: BuilderOptions): StandardQuery => ({
+  id: query.id,
+  field: query.field || handleMissingValue(options, `No field for query ${query.id}`),
+  operator: query.operator || handleMissingValue(options, `No operator for query ${query.id}`),
+  value: query.value, // validated by getValue
+  date: query.date,
+});
+
 const mapDateOp = (date: Date, dateOp: Exclude<DateOp, 'CALENDAR'>) =>
-  ` (CURRENT_DATE ${DATE_OP_MAP[dateOp]} ${date})`;
+  `(CURRENT_DATE ${DATE_OP_MAP[dateOp]} ${date})`;
 
 const getValue = (
-  type: string,
-  value: Value,
-  operator: string,
   { dateFormatter }: BuilderOptions,
+  type = '',
+  value: Value = '',
+  operator = '',
   dateOp?: DateOp,
 ) => {
   if (operator === 'is null' || operator === 'is not null') {
@@ -84,7 +97,7 @@ const getValue = (
       }
 
       return dateOp === 'CALENDAR'
-        ? ` '${dateFormatter(value as Date)}'`
+        ? `'${dateFormatter(value as Date)}'`
         : mapDateOp(value as Date, dateOp);
 
     case 'string':
@@ -92,10 +105,10 @@ const getValue = (
     case 'medium':
     case 'large':
       return operator === 'ilike' || operator === 'not ilike'
-        ? ` %${value}%`
-        : ` '${value}'`;
+        ? `%${value}%`
+        : `'${value}'`;
     default:
-      return ` ${value}`;
+      return `${value}`;
   }
 };
 
@@ -123,31 +136,36 @@ const buildWhereClause = (
       .join(` ${query.combinator.toUpperCase()} `)})`;
   }
 
+  // TODO: validate these bad boys
   if (isAssociatedQuery(query)) {
     const { associationTypeFieldName, associationType, ...innerQuery } = query;
-    return `${associationTypeFieldName} =${getValue(
+    return `${associationTypeFieldName} = ${getValue(
+      builderOptions,
       'string',
       associationType,
       '=',
-      builderOptions,
     )} and ${buildWhereClause(innerQuery, fieldOptions, builderOptions)}`;
   }
 
-  const { type } = fieldOptions.find(a => a.name === query.field) || {};
+  const validatedQuery = validateQuery(query, builderOptions);
+
+  const { type } = fieldOptions.find(a => a.name === validatedQuery.field) || {};
 
   if (!type) {
-    throw new Error(`Corresponding field option not found for field ${query.field}`);
+    handleMissingValue(builderOptions, `Corresponding field option not found for field ${query.field}`);
   }
 
   const value = getValue(
-    type,
-    query.value,
-    query.operator,
     builderOptions,
-    query.date,
+    type,
+    validatedQuery.value,
+    validatedQuery.operator,
+    validatedQuery.date,
   );
 
-  return `${query.field} ${query.operator}${value}`;
+  return [validatedQuery.field, validatedQuery.operator, value]
+    .filter(Boolean)
+    .join(' ');
 };
 
 const createQueryBuilder = (userOptions: BuilderOptions) => {

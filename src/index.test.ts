@@ -432,6 +432,27 @@ describe('Query Builder', () => {
 
         expect(queryBuilder.where(query, [])).toBe('()');
       });
+
+      it('should render empty parens if there`s a rule with no values', () => {
+        const fieldOptions = [
+          {
+            name: 'dob',
+            type: 'date',
+          },
+        ];
+
+        const query = {
+          id: '1',
+          combinator: 'or',
+          rules: [
+            {
+              id: '1',
+            },
+          ],
+        };
+
+        expect(queryBuilder.where(query, fieldOptions)).toBe('()');
+      });
     });
   });
 });
