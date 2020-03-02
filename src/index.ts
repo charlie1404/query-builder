@@ -144,30 +144,43 @@ const isAssociatedQuery = (query: DefinedQuery): query is AssociatedQuery =>
 const hasRules = (query: RootQuery): query is DefinedRootQuery =>
   Boolean(query.rules && query.rules.length);
 
-const buildAssociativeQuery = (query: AssociatedQuery, fieldOptions: FieldOption[], builderOptions: BuilderOptions) => {
+const buildAssociativeQuery = (
+  query: AssociatedQuery,
+  fieldOptions: FieldOption[],
+  builderOptions: BuilderOptions,
+) => {
   const {
     associationTypeFieldName,
     associationType,
     associationRankFieldName,
     associationRank,
-    ...innerQuery,
+    ...innerQuery
   } = query;
 
-  const valueClause = buildWhereClause(innerQuery, fieldOptions, builderOptions);
-
-  const rankClause = associationRankFieldName && associationRank
-    ? `${associationRankFieldName} = ${associationRank}`
-    : '';
-
-  return [`${associationTypeFieldName} = ${getValue(
+  const valueClause = buildWhereClause(
+    innerQuery,
+    fieldOptions,
     builderOptions,
-    'string',
-    '=',
-    associationType,
-  )}`, rankClause, valueClause]
+  );
+
+  const rankClause =
+    associationRankFieldName && associationRank
+      ? `${associationRankFieldName} = ${associationRank}`
+      : '';
+
+  return [
+    `${associationTypeFieldName} = ${getValue(
+      builderOptions,
+      'string',
+      '=',
+      associationType,
+    )}`,
+    rankClause,
+    valueClause,
+  ]
     .filter(Boolean)
     .join(' and ');
-}
+};
 
 const buildWhereClause = (
   query: DefinedQuery,
