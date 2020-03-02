@@ -1,7 +1,6 @@
 type DateFormatter = (date: Date) => string;
 type DateOp = 'ADD' | 'SUBTRACT' | 'CALENDAR';
-
-type Value = string | boolean | number | Date;
+type Value = string | boolean | number | Date | null;
 
 export enum Mode {
   Display, // for building strings that are rendered on the frontend
@@ -104,6 +103,7 @@ const getValue = (
 ) => {
   if (
     value === undefined ||
+    value === null ||
     operator === 'is null' ||
     operator === 'is not null'
   ) {

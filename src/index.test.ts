@@ -678,6 +678,34 @@ describe('Query Builder', () => {
         );
       });
 
+      it('should only render the field and operator if the value is a JS null value', () => {
+        const fieldOptions = [
+          {
+            name: 'useremail',
+            type: 'medium',
+          },
+        ];
+
+        const query = {
+          id: '1',
+          combinator: 'or',
+          rules: [
+            {
+              id: '1',
+              field: 'useremail',
+              operator: '=',
+              value: null,
+            },
+          ],
+        };
+
+        const expectedClause = `(useremail =)`;
+
+        expect(queryBuilder.where(query, fieldOptions, fieldMetadata)).toBe(
+          expectedClause,
+        );
+      });
+
       it('should only render the association type clause if the subsequent value clauses is empty', () => {
         const fieldOptions = [
           {
