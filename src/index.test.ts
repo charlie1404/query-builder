@@ -329,6 +329,50 @@ describe('Query Builder', () => {
         );
       });
 
+      it('should not strip out raw JS falsy values when the accompanying field option is a boolean or a number', () => {
+        const fieldOptions = [
+          {
+            name: 'issubscribed',
+            type: 'boolean',
+            label: 'Is Subscribed',
+            autocomplete: false,
+          },
+          {
+            name: 'ordercount',
+            type: 'integer',
+            label: 'Order Count',
+            autocomplete: false,
+          },
+        ];
+
+        const query = {
+          id: '1',
+          combinator: 'or',
+          rules: [
+            {
+              associationType: null,
+              field: 'issubscribed',
+              id: '1',
+              operator: '=',
+              value: false,
+            },
+            {
+              associationType: null,
+              field: 'ordercount',
+              id: '1',
+              operator: '=',
+              value: 0,
+            },
+          ],
+        };
+
+        const expectedClause = `(issubscribed = false OR ordercount = 0)`;
+
+        expect(queryBuilder.where(query, fieldOptions, fieldMetadata)).toBe(
+          expectedClause,
+        );
+      });
+
       it('should support nested rule groups', () => {
         const fieldOptions = [
           {

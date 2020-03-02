@@ -1,6 +1,7 @@
 type DateFormatter = (date: Date) => string;
 type DateOp = 'ADD' | 'SUBTRACT' | 'CALENDAR';
-type Value = string | Date;
+
+type Value = string | boolean | number | Date;
 
 export enum Mode {
   Display, // for building strings that are rendered on the frontend
@@ -67,7 +68,7 @@ const DATE_OP_MAP = {
 const handleMissingValue = (
   { mode }: BuilderOptions,
   reason: string,
-  displayFallback = '',
+  displayFallback?: string,
 ) => {
   if (mode === Mode.Validation) {
     throw new Error(reason);
@@ -101,12 +102,12 @@ const getValue = (
   value?: Value,
   dateOp?: DateOp,
 ) => {
-  if (!value) {
-    return '';
-  }
-
-  if (operator === 'is null' || operator === 'is not null') {
-    return '';
+  if (
+    value === undefined ||
+    operator === 'is null' ||
+    operator === 'is not null'
+  ) {
+    return undefined;
   }
 
   switch (type) {
@@ -130,7 +131,7 @@ const getValue = (
         ? `%${value}%`
         : `'${value}'`;
     default:
-      return `${value}`;
+      return value;
   }
 };
 
@@ -219,7 +220,7 @@ const buildWhereClause = (
   );
 
   return [validatedQuery.field, validatedQuery.operator, value]
-    .filter(Boolean)
+    .filter(p => p !== undefined)
     .join(' ');
 };
 
