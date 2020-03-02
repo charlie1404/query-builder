@@ -243,6 +243,38 @@ describe('Query Builder', () => {
         expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
       });
 
+      it('should include the association rank field when present in an associative query', () => {
+        const fieldOptions = [
+          {
+            name: 'associationvalue',
+            type: 'small',
+            label: 'Brand',
+            autocomplete: true,
+          },
+        ];
+
+        const query = {
+          id: '1',
+          combinator: 'and',
+          rules: [
+            {
+              associationTypeFieldName: 'associationtype',
+              associationType: 'Brand',
+              associationRankFieldName: 'associationrank',
+              associationRank: '2',
+              field: 'associationvalue',
+              id: '1',
+              operator: '=',
+              value: 'Nike',
+            },
+          ],
+        };
+
+        const expectedClause = `(associationtype = 'Brand' and associationrank = 2 and associationvalue = 'Nike')`;
+
+        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+      });
+
       /* This test is required as GraphQL will resolve
        * optional fields to `null` when the underlying
        * items don't have values for them. */

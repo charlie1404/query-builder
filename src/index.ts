@@ -45,6 +45,8 @@ interface StandardQuery {
 interface AssociatedQuery extends StandardQuery {
   associationTypeFieldName: string;
   associationType: string;
+  associationRankFieldName?: string;
+  associationRank?: string;
 }
 
 type DefinedQuery = DefinedRootQuery | AssociatedQuery | StandardQuery;
@@ -142,6 +144,31 @@ const isAssociatedQuery = (query: DefinedQuery): query is AssociatedQuery =>
 const hasRules = (query: RootQuery): query is DefinedRootQuery =>
   Boolean(query.rules && query.rules.length);
 
+const buildAssociativeQuery = (query: AssociatedQuery, fieldOptions: FieldOption[], builderOptions: BuilderOptions) => {
+  const {
+    associationTypeFieldName,
+    associationType,
+    associationRankFieldName,
+    associationRank,
+    ...innerQuery,
+  } = query;
+
+  const valueClause = buildWhereClause(innerQuery, fieldOptions, builderOptions);
+
+  const rankClause = associationRankFieldName && associationRank
+    ? `${associationRankFieldName} = ${associationRank}`
+    : '';
+
+  return [`${associationTypeFieldName} = ${getValue(
+    builderOptions,
+    'string',
+    '=',
+    associationType,
+  )}`, rankClause, valueClause]
+    .filter(Boolean)
+    .join(' and ');
+}
+
 const buildWhereClause = (
   query: DefinedQuery,
   fieldOptions: FieldOption[],
@@ -154,15 +181,7 @@ const buildWhereClause = (
   }
 
   if (isAssociatedQuery(query)) {
-    const { associationTypeFieldName, associationType, ...innerQuery } = query;
-    const clause = buildWhereClause(innerQuery, fieldOptions, builderOptions);
-
-    return `${associationTypeFieldName} = ${getValue(
-      builderOptions,
-      'string',
-      '=',
-      associationType,
-    )}${clause ? ` and ${clause}` : ''}`;
+    return buildAssociativeQuery(query, fieldOptions, builderOptions);
   }
 
   const validatedQuery = validateQuery(query, builderOptions);
