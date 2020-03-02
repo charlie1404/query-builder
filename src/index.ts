@@ -7,8 +7,14 @@ export enum Mode {
   Validation, // for validating complete queries, throwing an error when incomplete
 }
 
+interface FieldMetadata {
+  associationTypeFieldName: string;
+  associationRankFieldName?: string;
+}
+
 interface BuilderOptions {
   dateFormatter: DateFormatter;
+  fieldMetadata: FieldMetadata;
   mode?: Mode;
 }
 
@@ -43,9 +49,7 @@ interface StandardQuery {
 }
 
 interface AssociatedQuery extends StandardQuery {
-  associationTypeFieldName: string;
   associationType: string;
-  associationRankFieldName?: string;
   associationRank?: string;
 }
 
@@ -136,10 +140,7 @@ const isDefinedRootQuery = (query: DefinedQuery): query is DefinedRootQuery =>
   (query as DefinedRootQuery).rules.length > 0;
 
 const isAssociatedQuery = (query: DefinedQuery): query is AssociatedQuery =>
-  Boolean(
-    (query as AssociatedQuery).associationType &&
-      (query as AssociatedQuery).associationTypeFieldName,
-  );
+  Boolean((query as AssociatedQuery).associationType);
 
 const hasRules = (query: RootQuery): query is DefinedRootQuery =>
   Boolean(query.rules && query.rules.length);
@@ -149,13 +150,9 @@ const buildAssociativeQuery = (
   fieldOptions: FieldOption[],
   builderOptions: BuilderOptions,
 ) => {
-  const {
-    associationTypeFieldName,
-    associationType,
-    associationRankFieldName,
-    associationRank,
-    ...innerQuery
-  } = query;
+  const { associationType, associationRank, ...innerQuery } = query;
+
+  const { fieldMetadata } = builderOptions;
 
   const valueClause = buildWhereClause(
     innerQuery,
@@ -164,12 +161,12 @@ const buildAssociativeQuery = (
   );
 
   const rankClause =
-    associationRankFieldName && associationRank
-      ? `${associationRankFieldName} = ${associationRank}`
+    fieldMetadata.associationRankFieldName && associationRank
+      ? `${fieldMetadata.associationRankFieldName} = ${associationRank}`
       : '';
 
   return [
-    `${associationTypeFieldName} = ${getValue(
+    `${fieldMetadata.associationTypeFieldName} = ${getValue(
       builderOptions,
       'string',
       '=',

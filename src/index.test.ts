@@ -4,10 +4,16 @@ import createQueryBuilder, { Mode } from './';
 describe('Query Builder', () => {
   const dateFormatter = (date: Date) => moment(date).format('YYYY-MM-DD');
 
+  const fieldMetadata = {
+    associationTypeFieldName: 'associationtype',
+    associationRankFieldName: 'associationrank',
+  };
+
   describe('Mode = Validation', () => {
     // Validation is the default mode
     const queryBuilder = createQueryBuilder({
       dateFormatter,
+      fieldMetadata,
     });
 
     describe('where()', () => {
@@ -185,6 +191,7 @@ describe('Query Builder', () => {
 
         const gbBuilder = createQueryBuilder({
           dateFormatter: gbFormatter,
+          fieldMetadata,
         });
 
         const fieldOptions = [
@@ -228,7 +235,6 @@ describe('Query Builder', () => {
           combinator: 'and',
           rules: [
             {
-              associationTypeFieldName: 'associationtype',
               associationType: 'Brand',
               field: 'associationvalue',
               id: '1',
@@ -258,9 +264,7 @@ describe('Query Builder', () => {
           combinator: 'and',
           rules: [
             {
-              associationTypeFieldName: 'associationtype',
               associationType: 'Brand',
-              associationRankFieldName: 'associationrank',
               associationRank: '2',
               field: 'associationvalue',
               id: '1',
@@ -293,7 +297,6 @@ describe('Query Builder', () => {
           combinator: 'and',
           rules: [
             {
-              associationTypeFieldName: null,
               associationType: null,
               field: 'brand',
               id: '1',
@@ -445,6 +448,7 @@ describe('Query Builder', () => {
     const queryBuilder = createQueryBuilder({
       dateFormatter,
       mode: Mode.Display,
+      fieldMetadata,
     });
 
     describe('where()', () => {
@@ -612,7 +616,6 @@ describe('Query Builder', () => {
           combinator: 'and',
           rules: [
             {
-              associationTypeFieldName: 'associationtype',
               associationType: 'Brand',
               id: '1',
             },
@@ -639,7 +642,6 @@ describe('Query Builder', () => {
           combinator: 'and',
           rules: [
             {
-              associationTypeFieldName: 'associationtype',
               associationType: 'Brand',
               id: '1',
               field: 'associationvalue',
