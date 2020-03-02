@@ -167,15 +167,12 @@ const buildWhereClause = (
 
   const validatedQuery = validateQuery(query, builderOptions);
 
-  const { type } =
-    fieldOptions.find(a => a.name === validatedQuery.field) || {};
-
-  if (!type) {
-    handleMissingValue(
+  const {
+    type = handleMissingValue(
       builderOptions,
       `Corresponding field option not found for field ${query.field}`,
-    );
-  }
+    ),
+  } = fieldOptions.find(a => a.name === validatedQuery.field) || {};
 
   const value = getValue(
     builderOptions,
@@ -202,7 +199,7 @@ const createQueryBuilder = (userOptions: BuilderOptions) => {
         return handleMissingValue(options, 'Root query has no rules', '()');
       }
 
-      return `${buildWhereClause(query, fieldOptions, options)}`;
+      return buildWhereClause(query, fieldOptions, options);
     },
   };
 };

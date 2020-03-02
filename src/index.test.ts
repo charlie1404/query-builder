@@ -497,6 +497,25 @@ describe('Query Builder', () => {
         expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
       });
 
+      it('should render the value verbatim if there isn`t a field option for the given rule', () => {
+        const query = {
+          id: '1',
+          combinator: 'and',
+          rules: [
+            {
+              id: '1',
+              value: '1',
+              field: 'ordercount',
+              operator: '=',
+            },
+          ],
+        };
+
+        const expectedClause = '(ordercount = 1)';
+
+        expect(queryBuilder.where(query, [])).toBe(expectedClause);
+      });
+
       it('should only render the value if the field and operator are missing', () => {
         const fieldOptions = [
           {
