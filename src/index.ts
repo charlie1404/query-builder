@@ -9,12 +9,11 @@ export enum Mode {
 
 interface FieldMetadata {
   associationTypeFieldName: string;
-  associationRankFieldName?: string;
+  associationRankFieldName: string;
 }
 
 interface BuilderOptions {
   dateFormatter: DateFormatter;
-  fieldMetadata: FieldMetadata;
   mode?: Mode;
 }
 
@@ -148,15 +147,15 @@ const hasRules = (query: RootQuery): query is DefinedRootQuery =>
 const buildAssociativeQuery = (
   query: AssociatedQuery,
   fieldOptions: FieldOption[],
+  fieldMetadata: FieldMetadata,
   builderOptions: BuilderOptions,
 ) => {
   const { associationType, associationRank, ...innerQuery } = query;
 
-  const { fieldMetadata } = builderOptions;
-
   const valueClause = buildWhereClause(
     innerQuery,
     fieldOptions,
+    fieldMetadata,
     builderOptions,
   );
 
@@ -182,16 +181,24 @@ const buildAssociativeQuery = (
 const buildWhereClause = (
   query: DefinedQuery,
   fieldOptions: FieldOption[],
+  fieldMetadata: FieldMetadata,
   builderOptions: BuilderOptions,
 ): string => {
   if (isDefinedRootQuery(query)) {
     return `(${query.rules
-      .map(q => buildWhereClause(q, fieldOptions, builderOptions))
+      .map(q =>
+        buildWhereClause(q, fieldOptions, fieldMetadata, builderOptions),
+      )
       .join(` ${query.combinator.toUpperCase()} `)})`;
   }
 
   if (isAssociatedQuery(query)) {
-    return buildAssociativeQuery(query, fieldOptions, builderOptions);
+    return buildAssociativeQuery(
+      query,
+      fieldOptions,
+      fieldMetadata,
+      builderOptions,
+    );
   }
 
   const validatedQuery = validateQuery(query, builderOptions);
@@ -223,12 +230,17 @@ const createQueryBuilder = (userOptions: BuilderOptions) => {
   };
 
   return {
-    where: (query: RootQuery, fieldOptions: FieldOption[]) => {
+    // TODO: explain why fieldMetadata is passed here
+    where: (
+      query: RootQuery,
+      fieldOptions: FieldOption[],
+      fieldMetadata: FieldMetadata,
+    ) => {
       if (!hasRules(query)) {
         return handleMissingValue(options, 'Root query has no rules', '()');
       }
 
-      return buildWhereClause(query, fieldOptions, options);
+      return buildWhereClause(query, fieldOptions, fieldMetadata, options);
     },
   };
 };

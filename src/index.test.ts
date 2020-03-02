@@ -13,7 +13,6 @@ describe('Query Builder', () => {
     // Validation is the default mode
     const queryBuilder = createQueryBuilder({
       dateFormatter,
-      fieldMetadata,
     });
 
     describe('where()', () => {
@@ -50,7 +49,9 @@ describe('Query Builder', () => {
 
         const expectedClause = '(predltv = 2000 AND ordercount > 5)';
 
-        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+        expect(queryBuilder.where(query, fieldOptions, fieldMetadata)).toBe(
+          expectedClause,
+        );
       });
 
       it('should wrap string values in SQL wildcards when the operator is `ilike`', () => {
@@ -76,7 +77,9 @@ describe('Query Builder', () => {
 
         const expectedClause = '(useremail ilike %joebloggs%)';
 
-        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+        expect(queryBuilder.where(query, fieldOptions, fieldMetadata)).toBe(
+          expectedClause,
+        );
       });
 
       it('should wrap string values in SQL wildcards when the operator is `not ilike`', () => {
@@ -102,7 +105,9 @@ describe('Query Builder', () => {
 
         const expectedClause = '(useremail not ilike %joebloggs%)';
 
-        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+        expect(queryBuilder.where(query, fieldOptions, fieldMetadata)).toBe(
+          expectedClause,
+        );
       });
 
       it('should format the value as a date when when the type is `date` and the date operator is `CALENDAR`', () => {
@@ -129,7 +134,9 @@ describe('Query Builder', () => {
 
         const expectedClause = `(dob = '2020-02-26')`;
 
-        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+        expect(queryBuilder.where(query, fieldOptions, fieldMetadata)).toBe(
+          expectedClause,
+        );
       });
 
       it('should compute a date add operation when the date operator is `ADD`', () => {
@@ -156,7 +163,9 @@ describe('Query Builder', () => {
 
         const expectedClause = `(dob = (CURRENT_DATE + run date))`;
 
-        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+        expect(queryBuilder.where(query, fieldOptions, fieldMetadata)).toBe(
+          expectedClause,
+        );
       });
 
       it('should compute a date subtract operation when the date operator is `SUBTRACT`', () => {
@@ -183,7 +192,9 @@ describe('Query Builder', () => {
 
         const expectedClause = `(dob = (CURRENT_DATE - run date))`;
 
-        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+        expect(queryBuilder.where(query, fieldOptions, fieldMetadata)).toBe(
+          expectedClause,
+        );
       });
 
       it('should support different date formatters', () => {
@@ -191,7 +202,6 @@ describe('Query Builder', () => {
 
         const gbBuilder = createQueryBuilder({
           dateFormatter: gbFormatter,
-          fieldMetadata,
         });
 
         const fieldOptions = [
@@ -217,7 +227,9 @@ describe('Query Builder', () => {
 
         const expectedClause = `(dob = '26/02/2020')`;
 
-        expect(gbBuilder.where(query, fieldOptions)).toBe(expectedClause);
+        expect(gbBuilder.where(query, fieldOptions, fieldMetadata)).toBe(
+          expectedClause,
+        );
       });
 
       it('should build associative clauses when the query has associationType and associationField properties', () => {
@@ -246,7 +258,9 @@ describe('Query Builder', () => {
 
         const expectedClause = `(associationtype = 'Brand' and associationvalue = 'Nike')`;
 
-        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+        expect(queryBuilder.where(query, fieldOptions, fieldMetadata)).toBe(
+          expectedClause,
+        );
       });
 
       it('should include the association rank field when present in an associative query', () => {
@@ -276,7 +290,9 @@ describe('Query Builder', () => {
 
         const expectedClause = `(associationtype = 'Brand' and associationrank = 2 and associationvalue = 'Nike')`;
 
-        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+        expect(queryBuilder.where(query, fieldOptions, fieldMetadata)).toBe(
+          expectedClause,
+        );
       });
 
       /* This test is required as GraphQL will resolve
@@ -308,7 +324,9 @@ describe('Query Builder', () => {
 
         const expectedClause = `(brand = 'Nike')`;
 
-        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+        expect(queryBuilder.where(query, fieldOptions, fieldMetadata)).toBe(
+          expectedClause,
+        );
       });
 
       it('should support nested rule groups', () => {
@@ -360,7 +378,9 @@ describe('Query Builder', () => {
 
         const expectedClause = `(useremail = 'joebloggs@gmail.com' AND (ordercount > 20 OR customergender = 'male'))`;
 
-        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+        expect(queryBuilder.where(query, fieldOptions, fieldMetadata)).toBe(
+          expectedClause,
+        );
       });
 
       it('should throw an error when there isn`t a field option for a given query type', () => {
@@ -384,7 +404,9 @@ describe('Query Builder', () => {
           ],
         };
 
-        expect(() => queryBuilder.where(query, fieldOptions)).toThrow(
+        expect(() =>
+          queryBuilder.where(query, fieldOptions, fieldMetadata),
+        ).toThrow(
           new Error('Corresponding field option not found for field useremail'),
         );
       });
@@ -410,7 +432,9 @@ describe('Query Builder', () => {
           ],
         };
 
-        expect(() => queryBuilder.where(query, fieldOptions)).toThrow(
+        expect(() =>
+          queryBuilder.where(query, fieldOptions, fieldMetadata),
+        ).toThrow(
           new Error(
             'No date op provided for date condition with value of run date',
           ),
@@ -424,7 +448,7 @@ describe('Query Builder', () => {
           rules: [],
         };
 
-        expect(() => queryBuilder.where(query, [])).toThrow(
+        expect(() => queryBuilder.where(query, [], fieldMetadata)).toThrow(
           new Error('Root query has no rules'),
         );
       });
@@ -437,7 +461,7 @@ describe('Query Builder', () => {
           combinator: 'or',
         };
 
-        expect(() => queryBuilder.where(query, [])).toThrow(
+        expect(() => queryBuilder.where(query, [], fieldMetadata)).toThrow(
           new Error('Root query has no rules'),
         );
       });
@@ -448,7 +472,6 @@ describe('Query Builder', () => {
     const queryBuilder = createQueryBuilder({
       dateFormatter,
       mode: Mode.Display,
-      fieldMetadata,
     });
 
     describe('where()', () => {
@@ -458,7 +481,7 @@ describe('Query Builder', () => {
           combinator: 'or',
         };
 
-        expect(queryBuilder.where(query, [])).toBe('()');
+        expect(queryBuilder.where(query, [], fieldMetadata)).toBe('()');
       });
 
       it('should return an empty pair of parens when rules are empty', () => {
@@ -468,7 +491,7 @@ describe('Query Builder', () => {
           rules: [],
         };
 
-        expect(queryBuilder.where(query, [])).toBe('()');
+        expect(queryBuilder.where(query, [], fieldMetadata)).toBe('()');
       });
 
       it('should render empty parens if there`s a rule with no values', () => {
@@ -482,7 +505,7 @@ describe('Query Builder', () => {
           ],
         };
 
-        expect(queryBuilder.where(query, [])).toBe('()');
+        expect(queryBuilder.where(query, [], fieldMetadata)).toBe('()');
       });
 
       it('should only render the field if the operator and value are missing', () => {
@@ -506,7 +529,9 @@ describe('Query Builder', () => {
 
         const expectedClause = '(dob)';
 
-        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+        expect(queryBuilder.where(query, fieldOptions, fieldMetadata)).toBe(
+          expectedClause,
+        );
       });
 
       it('should only render the operator if the field and value are missing', () => {
@@ -530,7 +555,9 @@ describe('Query Builder', () => {
 
         const expectedClause = '(=)';
 
-        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+        expect(queryBuilder.where(query, fieldOptions, fieldMetadata)).toBe(
+          expectedClause,
+        );
       });
 
       it('should render the value verbatim if there isn`t a field option for the given rule', () => {
@@ -549,7 +576,9 @@ describe('Query Builder', () => {
 
         const expectedClause = '(ordercount = 1)';
 
-        expect(queryBuilder.where(query, [])).toBe(expectedClause);
+        expect(queryBuilder.where(query, [], fieldMetadata)).toBe(
+          expectedClause,
+        );
       });
 
       it('should only render the value if the field and operator are missing', () => {
@@ -573,7 +602,9 @@ describe('Query Builder', () => {
 
         const expectedClause = '(10)';
 
-        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+        expect(queryBuilder.where(query, fieldOptions, fieldMetadata)).toBe(
+          expectedClause,
+        );
       });
 
       it('should only render the field and operator if the value is missing', () => {
@@ -598,7 +629,9 @@ describe('Query Builder', () => {
 
         const expectedClause = `(useremail =)`;
 
-        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+        expect(queryBuilder.where(query, fieldOptions, fieldMetadata)).toBe(
+          expectedClause,
+        );
       });
 
       it('should only render the association type clause if the subsequent value clauses is empty', () => {
@@ -624,7 +657,9 @@ describe('Query Builder', () => {
 
         const expectedClause = `(associationtype = 'Brand')`;
 
-        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+        expect(queryBuilder.where(query, fieldOptions, fieldMetadata)).toBe(
+          expectedClause,
+        );
       });
 
       it('should only render the association type clause and field if the other parts are missing', () => {
@@ -651,7 +686,9 @@ describe('Query Builder', () => {
 
         const expectedClause = `(associationtype = 'Brand' and associationvalue)`;
 
-        expect(queryBuilder.where(query, fieldOptions)).toBe(expectedClause);
+        expect(queryBuilder.where(query, fieldOptions, fieldMetadata)).toBe(
+          expectedClause,
+        );
       });
     });
   });
