@@ -1,6 +1,6 @@
 {
   "name": "@peak-ai/query-builder",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Validate AIS-conformant query trees and serialise them as SQL strings",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
