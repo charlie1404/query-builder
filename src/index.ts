@@ -96,17 +96,14 @@ const mapDateOp = (date: Date, dateOp: Exclude<DateOp, 'CALENDAR'>) =>
 
 const getValue = (
   options: BuilderOptions,
+  { field, operator, value, date: dateOp }: StandardQuery,
   type = '',
-  operator = '',
-  value?: Value,
-  dateOp?: DateOp,
 ) => {
-  if (
-    value === undefined ||
-    value === null ||
-    operator === 'is null' ||
-    operator === 'is not null'
-  ) {
+  if (value === undefined || value === null) {
+    return handleMissingValue(options, `Missing value for field ${field}`);
+  }
+
+  if (operator === 'is null' || operator === 'is not null') {
     return undefined;
   }
 
@@ -166,12 +163,7 @@ const buildAssociativeQuery = (
       : '';
 
   return [
-    `${fieldMetadata.associationTypeFieldName} = ${getValue(
-      builderOptions,
-      'string',
-      '=',
-      associationType,
-    )}`,
+    `${fieldMetadata.associationTypeFieldName} = '${associationType}'`,
     rankClause,
     valueClause,
   ]
@@ -211,13 +203,7 @@ const buildWhereClause = (
     ),
   } = fieldOptions.find(a => a.name === validatedQuery.field) || {};
 
-  const value = getValue(
-    builderOptions,
-    type,
-    validatedQuery.operator,
-    validatedQuery.value,
-    validatedQuery.date,
-  );
+  const value = getValue(builderOptions, validatedQuery, type);
 
   return [validatedQuery.field, validatedQuery.operator, value]
     .filter(p => p !== undefined)

@@ -455,6 +455,58 @@ describe('Query Builder', () => {
         );
       });
 
+      it('should throw an error if the value is a JS null value', () => {
+        const fieldOptions = [
+          {
+            name: 'useremail',
+            type: 'medium',
+          },
+        ];
+
+        const query = {
+          id: '1',
+          combinator: 'or',
+          rules: [
+            {
+              id: '1',
+              field: 'useremail',
+              operator: '=',
+              value: null,
+            },
+          ],
+        };
+
+        expect(() =>
+          queryBuilder.where(query, fieldOptions, fieldMetadata),
+        ).toThrow(new Error('Missing value for field useremail'));
+      });
+
+      it('should throw an error if the value is a JS undefined value', () => {
+        const fieldOptions = [
+          {
+            name: 'useremail',
+            type: 'medium',
+          },
+        ];
+
+        const query = {
+          id: '1',
+          combinator: 'or',
+          rules: [
+            {
+              id: '1',
+              field: 'useremail',
+              operator: '=',
+              value: undefined,
+            },
+          ],
+        };
+
+        expect(() =>
+          queryBuilder.where(query, fieldOptions, fieldMetadata),
+        ).toThrow(new Error('Missing value for field useremail'));
+      });
+
       it('should throw an error for a date query when the date op isn`t provided', () => {
         const fieldOptions = [
           {
