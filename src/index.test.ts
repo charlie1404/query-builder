@@ -758,6 +758,96 @@ describe('Query Builder', () => {
         );
       });
 
+      it('should remove wildcard matchers if the field is a string type and operator is `ilike` and the value is an empty string', () => {
+        ['string', 'small', 'medium', 'large'].forEach(type => {
+          const fieldOptions = [
+            {
+              name: 'useremail',
+              type,
+            },
+          ];
+
+          const query = {
+            id: '1',
+            combinator: 'or',
+            rules: [
+              {
+                id: '1',
+                field: 'useremail',
+                operator: 'ilike',
+                value: '',
+              },
+            ],
+          };
+
+          const expectedClause = `(useremail ilike)`;
+
+          expect(queryBuilder.where(query, fieldOptions, fieldMetadata)).toBe(
+            expectedClause,
+          );
+        });
+      });
+
+      it('should remove wildcard matchers if the field is a string type and the operator is `not ilike` and the value is an empty string', () => {
+        ['string', 'small', 'medium', 'large'].forEach(type => {
+          const fieldOptions = [
+            {
+              name: 'useremail',
+              type,
+            },
+          ];
+
+          const query = {
+            id: '1',
+            combinator: 'or',
+            rules: [
+              {
+                id: '1',
+                field: 'useremail',
+                operator: 'not ilike',
+                value: '',
+              },
+            ],
+          };
+
+          const expectedClause = `(useremail not ilike)`;
+
+          expect(queryBuilder.where(query, fieldOptions, fieldMetadata)).toBe(
+            expectedClause,
+          );
+        });
+      });
+
+      it('should remove quotes if the field type is a string type and the operator is `=` and the value is an empty string', () => {
+        ['string', 'small', 'medium', 'large'].forEach(type => {
+          const fieldOptions = [
+            {
+              name: 'useremail',
+              type,
+            },
+          ];
+
+          const query = {
+            id: '1',
+            combinator: 'or',
+            rules: [
+              {
+                id: '1',
+                field: 'useremail',
+                operator: '=',
+                value: '',
+              },
+            ],
+          };
+
+          const expectedClause = `(useremail =)`;
+
+          expect(queryBuilder.where(query, fieldOptions, fieldMetadata)).toBe(
+            expectedClause,
+          );
+        });
+      });
+
       it('should only render the association type clause if the subsequent value clauses is empty', () => {
         const fieldOptions = [
           {
