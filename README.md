@@ -127,7 +127,7 @@ Builds, optionally validates, and returns an SQL string for the given query tree
 
 #### Returns
 
-`string`: an SQL compliant `WHERE` clause
+`string`: an SQL-compliant `WHERE` clause
 
 ## Local development
 
