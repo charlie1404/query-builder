@@ -112,7 +112,7 @@ Creates a query builder API surface for the given options.
 ### `QueryBuilder#where(query: RootQuery, fieldOptions: FieldOption[], fieldMetadata: FieldMetadata)`
 
 ```ts
-queryBuilder.where(query, fieldOptions, fieldMetadata)
+queryBuilder.where(query, fieldOptions, fieldMetadata);
 ```
 
 Builds, optionally validates, and returns an SQL string for the given query tree, intended to be used in an SQL `WHERE` clause.
