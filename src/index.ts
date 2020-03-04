@@ -217,7 +217,6 @@ const createQueryBuilder = (userOptions: BuilderOptions) => {
   };
 
   return {
-    // TODO: explain why fieldMetadata is passed here
     where: (
       query: RootQuery,
       fieldOptions: FieldOption[],

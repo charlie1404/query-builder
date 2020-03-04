@@ -6,6 +6,11 @@ Validate AIS-conformant query trees and serialise them as SQL strings.
 import createQueryBuilder from '@peak-ai/query-builder';
 import * as moment from 'moment';
 
+const fieldMetadata = {
+  associationTypeFieldName: 'associationtype',
+  associationRankFieldName: 'associationrank',
+};
+
 const fieldOptions = [
   {
     name: 'useremail',
@@ -55,7 +60,7 @@ const query = {
 const dateFormatter = (date: Date) => moment(date).format('YYYY-MM-DD');
 const queryBuilder = createQueryBuilder({ dateFormatter });
 
-console.log(queryBuilder.where(query, fieldOptions));
+console.log(queryBuilder.where(query, fieldOptions, fieldMetadata));
 // => `(useremail = 'joebloggs@gmail.com' AND (ordercount > 20 OR customergender = 'male'))`
 ```
 
@@ -80,6 +85,49 @@ const { default: createQueryBuilder, Mode } = require('@peak-ai/query-builder');
 ```
 
 ## API
+
+### `createQueryBuilder(options: BuilderOptions)`
+
+```ts
+const queryBuilder = createQueryBuilder({
+  dateFormatter: (date: Date) => moment(date).format('YYYY-MM-DD'),
+  mode: Mode.Display,
+});
+```
+
+Creates a query builder API surface for the given options.
+
+#### Arguments
+
+* `options: BuilderOptions`: an object containing:
+  * `dateFormatter: (date: Date) => string`: a function for converting dates to strings, the return value of which is used directly by the query builder
+  * `mode: Mode` (optional, defaulting to `Mode.Validation`): determines how the query builder should handle invalid query trees (missing values, no top-level rules etc.):
+    * `Mode.Display`: doesn't throw when the tree is deemed invalid, instead rendering fallback values within the rendered SQL strings
+    * `Mode.Validation`: explicitly throws an error when the query tree is deemed invalid
+
+#### Returns
+
+`QueryBuilder`: a query builder API surface
+
+### `QueryBuilder#where(query: RootQuery, fieldOptions: FieldOption[], fieldMetadata: FieldMetadata)`
+
+```ts
+queryBuilder.where(query, fieldOptions, fieldMetadata)
+```
+
+Builds, optionally validates, and returns an SQL string for the given query tree, intended to be used in an SQL `WHERE` clause.
+
+#### Arguments
+
+* `query: RootQuery`: a tree representing your SQL query. See the example at the beginning of the README
+* `fieldOptions: FieldOption[]`: an array of objects containing the names and data types of all the possible fields that can be queried. See the example at the beginning of the README
+* `fieldMetadata: FieldMetadata`: an object containing the column names of association fields:
+  * `associationTypeFieldName: string`: the column name of the association type field
+  * `associationRankFieldName: string`: the column name of the association rank field
+
+#### Returns
+
+`string`: an SQL compliant `WHERE` clause
 
 ## Local development
 
