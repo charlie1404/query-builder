@@ -94,10 +94,6 @@ const validateQuery = (
 const mapDateOp = (date: Date, dateOp: Exclude<DateOp, 'CALENDAR'>) =>
   `(CURRENT_DATE ${DATE_OP_MAP[dateOp]} ${date})`;
 
-// const formatString = (operator: string, value: string) => {
-
-// };
-
 const getValue = (
   options: BuilderOptions,
   { field, operator, value, date: dateOp }: StandardQuery,
