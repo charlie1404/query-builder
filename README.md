@@ -103,3 +103,5 @@ You can then run:
 * `yarn test`: runs the unit tests
 
 ## Contributing
+
+Given this library is rather specific to our commercial requirements, we can't accept any contributions that change the _behaviour_ of the library. However, any contributions that may improve the underlying implementation (e.g. maintainability, performance etc.) will be considered given the test suite continues to pass. Please see the [contribution guidelines](https://github.com/peak-ai/query-builder/blob/master/CONTRIBUTING.md) for more info.
