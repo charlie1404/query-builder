@@ -1,5 +1,7 @@
 # Query Builder
 
+![Build status](https://github.com/peak-ai/query-builder/workflows/Build/badge.svg)
+
 Validate AIS-conformant query trees and serialise them as SQL strings.
 
 ```ts
