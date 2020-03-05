@@ -147,8 +147,7 @@ Prerequisites:
 You can then run:
 
 * `yarn lint`: runs ESLint against the source code
-* `yarn format:check`: verifies that the source code adheres to our Prettier configuration
-* `yarn format:write`: fixes and overwrites any source files that _don't_ adhere to our Prettier config
+* `yarn format`: fixes and overwrites any source files that _don't_ adhere to our Prettier config
 * `yarn build`: runs the TypeScript compiler against the project and produces distributable output
 * `yarn test`: runs the unit tests
 * `yarn test:dist`: runs the compiled unit tests against the compiled source. Typically used by our pre-commit hook, CI, and pre-publish script
