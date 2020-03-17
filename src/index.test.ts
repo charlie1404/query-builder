@@ -561,6 +561,60 @@ describe('Query Builder', () => {
           new Error('Root query has no rules'),
         );
       });
+
+      it('should not throw an error if the operator is `is null` and the value is thus omitted', () => {
+        const fieldOptions = [
+          {
+            name: 'useremail',
+            type: 'string',
+          },
+        ];
+
+        const query = {
+          id: '1',
+          combinator: 'and',
+          rules: [
+            {
+              id: '1',
+              field: 'useremail',
+              operator: 'is null',
+            },
+          ],
+        };
+
+        const expectedClause = '(useremail is null)';
+
+        expect(queryBuilder.where(query, fieldOptions, fieldMetadata)).toBe(
+          expectedClause,
+        );
+      });
+
+      it('should not throw an error if the operator is `is not null` and the value is thus omitted', () => {
+        const fieldOptions = [
+          {
+            name: 'useremail',
+            type: 'string',
+          },
+        ];
+
+        const query = {
+          id: '1',
+          combinator: 'and',
+          rules: [
+            {
+              id: '1',
+              field: 'useremail',
+              operator: 'is not null',
+            },
+          ],
+        };
+
+        const expectedClause = '(useremail is not null)';
+
+        expect(queryBuilder.where(query, fieldOptions, fieldMetadata)).toBe(
+          expectedClause,
+        );
+      });
     });
   });
 

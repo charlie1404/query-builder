@@ -99,12 +99,12 @@ const getValue = (
   { field, operator, value, date: dateOp }: StandardQuery,
   type = '',
 ) => {
-  if (value === '' || value === undefined || value === null) {
-    return handleMissingValue(options, `Missing value for field ${field}`);
-  }
-
   if (operator === 'is null' || operator === 'is not null') {
     return undefined;
+  }
+
+  if (value === '' || value === undefined || value === null) {
+    return handleMissingValue(options, `Missing value for field ${field}`);
   }
 
   switch (type) {
