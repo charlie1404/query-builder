@@ -479,8 +479,7 @@ describe('Query Builder', () => {
         expect(() =>
           queryBuilder.where(query, fieldOptions, fieldMetadata),
         ).toThrow(new Error('Missing value for field useremail'));
-
-      })
+      });
 
       it('should throw an error if the value is a JS null value', () => {
         const fieldOptions = [
