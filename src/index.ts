@@ -103,7 +103,11 @@ const getValue = (
     return undefined;
   }
 
-  if (typeof value === 'string' && value.trim() === '' || value === undefined || value === null) {
+  if (
+    (typeof value === 'string' && value.trim() === '') ||
+    value === undefined ||
+    value === null
+  ) {
     return handleMissingValue(options, `Missing value for field ${field}`);
   }
 
