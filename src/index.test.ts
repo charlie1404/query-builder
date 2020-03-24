@@ -974,13 +974,11 @@ describe('Query Builder', () => {
               associationType: 'Brand',
               id: '1',
               field: 'associationvalue',
-              operator: '=',
-              value: 'Nike',
             },
           ],
         };
 
-        const expectedClause = `(associationtype = 'Brand' and associationvalue = 'Nike')`;
+        const expectedClause = `(associationtype = 'Brand' and associationvalue)`;
 
         expect(queryBuilder.where(query, fieldOptions, fieldMetadata)).toBe(
           expectedClause,
