@@ -984,6 +984,36 @@ describe('Query Builder', () => {
           expectedClause,
         );
       });
+
+      it('should omit the association rank from the query when its value is `All`', () => {
+        const fieldOptions = [
+          {
+            name: 'associationvalue',
+            type: 'small',
+            label: 'Brand',
+            autocomplete: true,
+          },
+        ];
+
+        const query = {
+          id: '1',
+          combinator: 'and',
+          rules: [
+            {
+              associationType: 'Brand',
+              associationRank: 'all',
+              id: '1',
+              field: 'associationvalue',
+            },
+          ],
+        };
+
+        const expectedClause = `(associationtype = 'Brand' and associationvalue)`;
+
+        expect(queryBuilder.where(query, fieldOptions, fieldMetadata)).toBe(
+          expectedClause,
+        );
+      });
     });
   });
 });
