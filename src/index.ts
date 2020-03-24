@@ -146,6 +146,11 @@ const isAssociatedQuery = (query: DefinedQuery): query is AssociatedQuery =>
 const hasRules = (query: RootQuery): query is DefinedRootQuery =>
   Boolean(query.rules && query.rules.length);
 
+const includeAssocationRank = (
+  { associationRankFieldName }: FieldMetadata,
+  associationRank?: string,
+) => associationRankFieldName && associationRank && associationRank !== 'all';
+
 const buildAssociativeQuery = (
   query: AssociatedQuery,
   fieldOptions: FieldOption[],
@@ -161,10 +166,9 @@ const buildAssociativeQuery = (
     builderOptions,
   );
 
-  const rankClause =
-    fieldMetadata.associationRankFieldName && associationRank
-      ? `${fieldMetadata.associationRankFieldName} = ${associationRank}`
-      : '';
+  const rankClause = includeAssocationRank(fieldMetadata, associationRank)
+    ? `${fieldMetadata.associationRankFieldName} = ${associationRank}`
+    : '';
 
   return [
     `${fieldMetadata.associationTypeFieldName} = '${associationType}'`,

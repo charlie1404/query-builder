@@ -974,6 +974,38 @@ describe('Query Builder', () => {
               associationType: 'Brand',
               id: '1',
               field: 'associationvalue',
+              operator: '=',
+              value: 'Nike',
+            },
+          ],
+        };
+
+        const expectedClause = `(associationtype = 'Brand' and associationvalue = 'Nike')`;
+
+        expect(queryBuilder.where(query, fieldOptions, fieldMetadata)).toBe(
+          expectedClause,
+        );
+      });
+
+      it('should omit the association rank from the query when its value is `All`', () => {
+        const fieldOptions = [
+          {
+            name: 'associationvalue',
+            type: 'small',
+            label: 'Brand',
+            autocomplete: true,
+          },
+        ];
+
+        const query = {
+          id: '1',
+          combinator: 'and',
+          rules: [
+            {
+              associationType: 'Brand',
+              associationRank: 'all',
+              id: '1',
+              field: 'associationvalue',
             },
           ],
         };
